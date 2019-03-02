@@ -31,7 +31,8 @@ public class Moonlight extends ApplicationAdapter {
   @Override
   public void create() {
     batch = new SpriteBatch();
-    background = new Texture(Gdx.files.internal("images/background.jpg"));
+    //Texture backgroundTexture = new Texture(Gdx.files.internal("images/background.jpg"));
+    //backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
     playerSpriteRight = new Sprite(new Texture("images/CharFaceRight.png"));
     playerSpriteRight.setSize(2, 3);
     playerSpriteLeft = new Sprite(new Texture("images/CharFaceLeft.png"));
@@ -62,7 +63,7 @@ public class Moonlight extends ApplicationAdapter {
     Gdx.gl.glClearColor(0, 0, 0, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     batch.begin();
-    batch.draw(background, 1, 1, 5, 5, WORLD_WIDTH, WORLD_HEIGHT);
+    //batch.draw(background, 0, 0, WORLD_WIDTH, 0, WORLD_WIDTH, WORLD_HEIGHT);
     player.draw(batch);
     brick.draw(batch);
     batch.end();
