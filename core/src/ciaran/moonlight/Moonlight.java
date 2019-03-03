@@ -3,12 +3,13 @@ package ciaran.moonlight;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Moonlight extends ApplicationAdapter {
   private static final float WALK_SPEED = 20;
@@ -18,21 +19,28 @@ public class Moonlight extends ApplicationAdapter {
   Sprite playerSpriteLeft;
   Sprite player;
   Sprite brick;
-  Texture background;
+  Sprite background;
   float xChar = 0;
   float yChar = 0;
   float ySpeed = 0;
 
-  static final int WORLD_WIDTH = 100;
-  static final int WORLD_HEIGHT = 100;
+  float CAM_WIDTH;
+  float CAM_HEIGHT;
 
   private OrthographicCamera cam;
+
+  private void createBackground() {
+    Texture backgroundTexture = new Texture(Gdx.files.internal("images/background.jpg"));
+    backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+    TextureRegion backgroundTextureRegion = new TextureRegion(backgroundTexture);
+    background = new Sprite(backgroundTextureRegion, 0, 0, 1280 * 3, 720);
+    background.setSize(CAM_WIDTH * 3, CAM_HEIGHT);
+  }
 
   @Override
   public void create() {
     batch = new SpriteBatch();
-    //Texture backgroundTexture = new Texture(Gdx.files.internal("images/background.jpg"));
-    //backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+
     playerSpriteRight = new Sprite(new Texture("images/CharFaceRight.png"));
     playerSpriteRight.setSize(2, 3);
     playerSpriteLeft = new Sprite(new Texture("images/CharFaceLeft.png"));
@@ -46,12 +54,14 @@ public class Moonlight extends ApplicationAdapter {
     float w = Gdx.graphics.getWidth();
     float h = Gdx.graphics.getHeight();
 
-    cam = new OrthographicCamera(30, 30 * (h / w));
+    CAM_WIDTH = 30;
+    CAM_HEIGHT = 30 * (h / w);
+
+    cam = new OrthographicCamera(CAM_WIDTH, CAM_HEIGHT);
 
     cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
     cam.update();
-
-    batch = new SpriteBatch();
+    createBackground();
   }
 
   @Override
@@ -63,7 +73,10 @@ public class Moonlight extends ApplicationAdapter {
     Gdx.gl.glClearColor(0, 0, 0, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     batch.begin();
-    //batch.draw(background, 0, 0, WORLD_WIDTH, 0, WORLD_WIDTH, WORLD_HEIGHT);
+
+    background.setPosition(-CAM_WIDTH / 2 + (xChar - xChar % CAM_WIDTH), - 4);
+    background.draw(batch);
+
     player.draw(batch);
     brick.draw(batch);
     batch.end();
@@ -73,13 +86,6 @@ public class Moonlight extends ApplicationAdapter {
   public void dispose() {
     batch.dispose();
     player.getTexture().dispose();
-  }
-
-  @Override
-  public void resize(int width, int height) {
-    cam.viewportWidth = 30f;
-    cam.viewportHeight = 30f * height / width;
-    cam.update();
   }
 
   public void handleInput() {
@@ -109,6 +115,8 @@ public class Moonlight extends ApplicationAdapter {
 
 
     if (isSpacePressed && yChar == 0) {
+      Sound sound = Gdx.audio.newSound(Gdx.files.internal("images/jump.ogg"));
+      sound.play();
       ySpeed -= 50;
     }
 
