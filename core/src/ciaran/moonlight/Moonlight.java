@@ -89,14 +89,24 @@ public class Moonlight extends ApplicationAdapter {
   }
 
   public void handleInput() {
+    Sound sound = Gdx.audio.newSound(Gdx.files.internal("images/jump.ogg"));
+    Sound walksound1 = Gdx.audio.newSound(Gdx.files.internal("images/step_cloth1.ogg"));
+    Sound walksound2 = Gdx.audio.newSound(Gdx.files.internal("images/step_cloth2.ogg"));
+    Sound walksound3 = Gdx.audio.newSound(Gdx.files.internal("images/step_cloth3.ogg"));
+    Sound walksound4 = Gdx.audio.newSound(Gdx.files.internal("images/step_cloth4.ogg"));
     float deltaTime = Gdx.graphics.getDeltaTime();
     boolean isRightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
     boolean isLeftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
     boolean isSpacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
 
+
     if (isLeftPressed) {
       player = playerSpriteLeft;
       xChar -= WALK_SPEED * deltaTime;
+      walksound1.play();
+      walksound2.play();
+      walksound3.play();
+      walksound4.play();
     }
 
     if (isRightPressed) {
@@ -115,7 +125,6 @@ public class Moonlight extends ApplicationAdapter {
 
 
     if (isSpacePressed && yChar == 0) {
-      Sound sound = Gdx.audio.newSound(Gdx.files.internal("images/jump.ogg"));
       sound.play();
       ySpeed -= 50;
     }
