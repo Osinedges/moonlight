@@ -18,15 +18,16 @@ import ciaran.moonlight.shared.Character
 
 fun makeListener(server: Server, loggedInCharacters: HashSet<Character>) : Listener {
   return object : Listener() {
-    override fun received(c: Connection, `object`: Any?) {
+    override fun received(c: Connection, obj: Any?) {
 
-      if (`object` is Network.Login) {
+      if (obj is Network.Login) {
         //          // Ignore if already logged in.
         //          if (character != null) return;
 
         // Reject if the name is invalid.
-        val name = `object`.name
+        val name = obj.name
         if (!validateName(name)) {
+          println("Rejected: name invalid")
           c.close()
           return
         }
@@ -34,6 +35,7 @@ fun makeListener(server: Server, loggedInCharacters: HashSet<Character>) : Liste
         // Reject if already logged in.
         for (other in loggedInCharacters) {
           if (other.name == name) {
+            println("Rejected: already logged in")
             c.close()
             return
           }
@@ -51,11 +53,11 @@ fun makeListener(server: Server, loggedInCharacters: HashSet<Character>) : Liste
         return
       }
 
-      if (`object` is Network.Register) {
+      if (obj is Network.Register) {
         //          // Ignore if already logged in.
         //          if (character != null) return;
 
-        val register = `object` as Network.Register?
+        val register = obj as Network.Register?
 
         // Reject if the login is invalid.
         if (!validateName(register!!.name)) {
@@ -75,7 +77,7 @@ fun makeListener(server: Server, loggedInCharacters: HashSet<Character>) : Liste
         character.x = 0
         character.y = 0
         if (!saveCharacter(character)) {
-          c!!.close()
+          c.close()
           return
         }
 
@@ -83,11 +85,11 @@ fun makeListener(server: Server, loggedInCharacters: HashSet<Character>) : Liste
         return
       }
 
-      if (`object` is Network.MoveCharacter) {
+      if (obj is Network.MoveCharacter) {
         // Ignore if not logged in.
         //          if (character == null) return;
 
-        val msg = `object` as Network.MoveCharacter?
+        val msg = obj as Network.MoveCharacter?
 
         // Ignore if invalid move.
         if (Math.abs(msg!!.x) != 1 && Math.abs(msg.y) != 1) return
@@ -178,7 +180,7 @@ internal fun loggedIn(server: Server,
   for (other in loggedInCharacters) {
     val addCharacter = Network.AddCharacter()
     addCharacter.character = other
-    c!!.sendTCP(addCharacter)
+    c.sendTCP(addCharacter)
   }
 
   loggedInCharacters.add(character)
@@ -190,9 +192,7 @@ internal fun loggedIn(server: Server,
 }
 
 private fun validateName(value: String?): Boolean {
-  var value: String = value ?: return false
-  value = value.trim { it <= ' ' }
-  return value.isNotEmpty()
+  return value?.trim { it <= ' ' } ?.isNotEmpty() ?: false
 }
 
 fun main() {

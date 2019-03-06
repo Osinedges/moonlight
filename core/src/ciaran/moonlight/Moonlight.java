@@ -112,7 +112,6 @@ public class Moonlight implements Screen {
 
   @Override
   public void render(float deltaTime) {
-    System.out.println("Handling input" + deltaTime);
     if (!paused) {
       handleInput(deltaTime);
       cam.update();
