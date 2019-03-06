@@ -159,7 +159,7 @@ public class Moonlight implements Screen {
     font.draw(uiBatch, "Level: " + player.getLvl(), 10, Gdx.graphics.getHeight() - 8);
     font.draw(uiBatch, "Experience: " + player.getXp(), 10, Gdx.graphics.getHeight() - 32);
     font.draw(uiBatch, "Hitpoints: " + player.getHp() + "/100", 10, Gdx.graphics.getHeight() - 56);
-    if(player.getDead()){
+    if(player.isDead()){
       font.draw(uiBatch, "You Fucking Suck", 50, 50);
     }
     uiBatch.end();
@@ -202,21 +202,21 @@ public class Moonlight implements Screen {
       paused = true;
     }
 
-    if (walking && !isWalkButtonHeld){
+    if (walking && !isWalkButtonHeld && !player.isDead()){
       stepping.stop();
       walking = false;
     }
-    else if (!walking && isWalkButtonHeld) {
+    else if (!walking && isWalkButtonHeld && !player.isDead()) {
       stepping.loop();
       walking = true;
     }
 
-    if (isLeftPressed) {
+    if (isLeftPressed && !player.isDead()) {
       player.rotateLeft();
       player.move(deltaTime);
     }
 
-    if (isRightPressed) {
+    if (isRightPressed && !player.isDead()) {
       player.rotateRight();
       player.move(deltaTime);
     }
@@ -230,12 +230,12 @@ public class Moonlight implements Screen {
       ySpeed = 0;
     }
 
-    if (player.getLogicalBoundingRectangle().overlaps(brick.getBoundingRectangle())) {
+    if (player.getLogicalBoundingRectangle().overlaps(brick.getBoundingRectangle()) && !player.isDead()) {
       player.setPosition(player.getX(), brick.getY() + brick.getHeight());
       ySpeed = 0;
     }
 
-    if (isSpacePressed && ySpeed == 0) {
+    if (isSpacePressed && ySpeed == 0 && !player.isDead()) {
       jumping.play(0.1f);
       ySpeed -= 50;
     }

@@ -13,6 +13,7 @@ public class Player {
   TextureAtlas playerAtlas;
   Sprite playerRightRegion;
   Sprite playerLeftRegion;
+  Sprite playerDeadRegion;
   Sprite player;
 
   private int id;
@@ -30,7 +31,9 @@ public class Player {
     playerRightRegion.setSize(WIDTH, HEIGHT);
     playerLeftRegion = playerAtlas.createSprite("playerLeft");
     playerLeftRegion.setSize(WIDTH, HEIGHT);
-    player = playerRightRegion;
+    playerDeadRegion = playerAtlas.createSprite("playerDead");
+    playerDeadRegion.setSize(3.4f, 2);
+    player = playerDeadRegion;
   }
 
   public void setId(int id) {
@@ -48,7 +51,7 @@ public class Player {
   public int getXp() {
     return xp;
   }
-  public boolean getDead(){
+  public boolean isDead(){
     return dead;
   }
 
@@ -65,6 +68,7 @@ public class Player {
     }
     else{
       dead = true;
+      player = playerDeadRegion;
     }
   }
 
@@ -106,6 +110,7 @@ public class Player {
     this.y = y;
     playerLeftRegion.setPosition(x, y);
     playerRightRegion.setPosition(x, y);
+    playerDeadRegion.setPosition(x, y);
   }
 
   public float getY() {
