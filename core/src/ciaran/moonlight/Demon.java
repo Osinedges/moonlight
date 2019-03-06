@@ -64,6 +64,6 @@ public class Demon {
 
   public void move(float deltaTime) {
     float velocity = demon == demonLeftRegion ? - WALK_SPEED : WALK_SPEED;
-    setPosition(getX() + velocity * deltaTime, -0.7f);
+    setPosition(getX() + velocity * deltaTime, getY());
   }
 }

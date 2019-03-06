@@ -146,13 +146,15 @@ public class Moonlight implements Screen {
       shapeRenderer.setColor(1, 0, 0, 0.2f);
       shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       shapeRenderer.end();
+      player.damage(1);
     }
-
-
-    uiBatch.begin();
+      uiBatch.begin();
     font.draw(uiBatch, "Level: " + player.getLvl(), 10, Gdx.graphics.getHeight() - 8);
     font.draw(uiBatch, "Experience: " + player.getXp(), 10, Gdx.graphics.getHeight() - 32);
-
+    font.draw(uiBatch, "Hitpoints: " + player.getHp() + "/100", 10, Gdx.graphics.getHeight() - 56);
+    if(player.getDead()){
+      font.draw(uiBatch, "You Fucking Suck", 50, 50);
+    }
     uiBatch.end();
 
   }
