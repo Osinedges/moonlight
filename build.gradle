@@ -120,6 +120,18 @@ project(":core") {
   }
 }
 
+project(":shared") {
+
+}
+
+project(":server") {
+  apply plugin: "java"
+
+  dependencies {
+    compile project(":shared")
+  }
+}
+
 tasks.eclipse.doLast {
   delete ".project"
 }
