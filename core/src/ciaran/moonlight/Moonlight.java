@@ -203,6 +203,10 @@ public class Moonlight implements Screen {
       stepping.loop();
       walking = true;
     }
+    if (player.isDead()) {
+      stepping.stop();
+      walking = false;
+    }
 
     if (isLeftPressed && !player.isDead()) {
       player.rotateLeft();

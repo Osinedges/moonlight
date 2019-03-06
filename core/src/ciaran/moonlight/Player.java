@@ -32,7 +32,7 @@ public class Player {
     playerLeftRegion.setSize(WIDTH, HEIGHT);
     playerDeadRegion = playerAtlas.createSprite("playerDead");
     playerDeadRegion.setSize(3.4f, 2);
-    player = playerDeadRegion;
+    player = playerRightRegion;
   }
 
   public void setXP(int xp) {
