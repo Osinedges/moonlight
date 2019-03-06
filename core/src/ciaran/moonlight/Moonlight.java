@@ -15,9 +15,14 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
+import java.util.Random;
+
 
 public class Moonlight extends ApplicationAdapter {
   private static final float WALK_SPEED = 20;
+
+  Random rand = new Random();
+
   Demon demon;
 
   SpriteBatch batch;
@@ -169,13 +174,11 @@ public class Moonlight extends ApplicationAdapter {
 
     if (isLeftPressed) {
       player.setTexture(playerSpriteLeft);
-      demon.rotateLeft();
       player.setX(player.getX() - WALK_SPEED * deltaTime);
     }
 
     if (isRightPressed) {
       player.setTexture(playerSpriteRight);
-      demon.rotateRight();
       player.setX(player.getX() + WALK_SPEED * deltaTime);
     }
 
@@ -206,6 +209,9 @@ public class Moonlight extends ApplicationAdapter {
   }
   private void demonWalk(float deltaTime){
     demon.move(deltaTime);
+    if (rand.nextInt(100) == 1) {
+      demon.rotate();
+    }
   }
   private Rectangle getLogicalPlayerRectangle() {
     Rectangle visualRectangle = player.getBoundingRectangle();

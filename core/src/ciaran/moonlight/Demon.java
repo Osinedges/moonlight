@@ -39,6 +39,14 @@ public class Demon {
     demon = demonRightRegion;
   }
 
+  public void rotate() {
+    if (demon == demonLeftRegion) {
+      rotateRight();
+    } else {
+      rotateLeft();
+    }
+  }
+
   public Sprite getSprite() {
     return demon;
   }
