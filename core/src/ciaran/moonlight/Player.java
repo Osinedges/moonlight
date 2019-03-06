@@ -18,6 +18,7 @@ public class Player {
   private int xp = 0;
   private int lvl = 1;
   private int hp = 100;
+  private boolean dead = false;
   private float x;
   private float y;
   float ySpeed = 0;
@@ -38,6 +39,9 @@ public class Player {
   public int getXp() {
     return xp;
   }
+  public boolean getDead(){
+    return dead;
+  }
 
   public void setLvl(int lvl) {
     this.lvl = lvl;
@@ -46,9 +50,13 @@ public class Player {
   public int getLvl() {
     return lvl;
   }
-
-  public void setHp(int hp) {
-    this.hp = hp;
+  public void damage(int damage) {
+    if (hp > 0) {
+      hp = hp - damage;
+    }
+    else{
+      dead = true;
+    }
   }
 
   public int getHp() {
@@ -101,7 +109,7 @@ public class Player {
 
   public void move(float deltaTime) {
     float velocity = player == playerLeftRegion ? -WALK_SPEED : WALK_SPEED;
-    setPosition(getX() + velocity * deltaTime, -0.7f);
+    setPosition(getX() + velocity * deltaTime, getY());
   }
 
   public Rectangle getLogicalBoundingRectangle() {
