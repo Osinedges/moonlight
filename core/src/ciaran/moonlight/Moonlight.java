@@ -14,7 +14,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+
+import ciaran.moonlight.shared.Character;
 
 
 public class Moonlight implements Screen {
@@ -24,6 +29,7 @@ public class Moonlight implements Screen {
   private final Orchestrator parent;
   Demon demon;
   Player player;
+  List<Player> otherPlayers = new ArrayList<>();
 
   SpriteBatch batch;
   SpriteBatch uiBatch;
@@ -128,6 +134,7 @@ public class Moonlight implements Screen {
 
     if (!paused) {
       player.getSprite().draw(batch);
+      otherPlayers.forEach(player -> player.getSprite().draw(batch));
       demon.getSprite().draw(batch);
       brick.draw(batch);
       pauseDelta = 0;
@@ -237,11 +244,16 @@ public class Moonlight implements Screen {
       ySpeed -= 50;
     }
 
+    if (parent.myId != -1) {
+      parent.networkClient.sendMovement(
+        parent.myId, player.getX(), player.getY(), player.isFacingRight()
+      );
+    }
 
     demonWalk(deltaTime);
     cam.position.set(player.getX(), player.getY(), 0);
-
   }
+
   private void demonWalk(float deltaTime){
     demon.move(deltaTime);
     if (rand.nextInt(100) == 1) {
@@ -249,4 +261,33 @@ public class Moonlight implements Screen {
     }
   }
 
+  public void addCharacter(Character character) {
+    if (character.name.equals(Orchestrator.NAME)) {
+      parent.myId = character.id;
+      return;
+    }
+    Player otherPlayer = new Player();
+    otherPlayer.setId(character.id);
+    otherPlayer.setPosition(character.x, character.y);
+    otherPlayers.add(otherPlayer);
+  }
+
+  public void moveCharacter(int id, float x, float y, boolean isFacingRight) {
+    System.out.println(otherPlayers);
+    if (id == parent.myId) {
+      return;
+    }
+
+    otherPlayers
+      .stream().filter(p -> p.getId() == id)
+      .findFirst()
+      .ifPresent(p -> {
+        p.setPosition(x, y);
+        if (isFacingRight) {
+          p.rotateRight();
+        } else {
+          p.rotateLeft();
+        }
+      });
+  }
 }

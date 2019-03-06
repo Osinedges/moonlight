@@ -32,11 +32,18 @@ public class Network {
   }
 
   static public class UpdateCharacter {
-    public int id, x, y;
+    public int id;
+    public float x, y;
+    public boolean facingRight;
   }
 
   static public class AddCharacter {
     public Character character;
+
+    @Override
+    public String toString() {
+      return "Add Character ---> " + character.toString();
+    }
   }
 
   static public class RemoveCharacter {
@@ -44,6 +51,18 @@ public class Network {
   }
 
   static public class MoveCharacter {
-    public int x, y;
+    public int id;
+    public float x, y;
+    public boolean facingRight;
+
+    @Override
+    public String toString() {
+      return "MoveCharacter{" +
+        "id=" + id +
+        ", x=" + x +
+        ", y=" + y +
+        ", facingRight=" + facingRight +
+        '}';
+    }
   }
 }

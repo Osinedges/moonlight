@@ -2,6 +2,7 @@ package ciaran.moonlight;
 
 import java.io.IOException;
 
+import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -10,10 +11,12 @@ import com.esotericsoftware.kryonet.Listener.ThreadedListener;
 import ciaran.moonlight.shared.Network;
 
 public class NetworkClient {
+  private final Orchestrator orchestrator;
   private Client client;
   private String name;
 
-  public NetworkClient(String host, String name, String otherStuff) {
+  public NetworkClient(Orchestrator orchestrator, String host, String name, String otherStuff) {
+    this.orchestrator = orchestrator;
     client = new Client();
     client.start();
 
@@ -34,12 +37,18 @@ public class NetworkClient {
 
         if (object instanceof Network.AddCharacter) {
           Network.AddCharacter msg = (Network.AddCharacter) object;
-//          ui.addCharacter(msg.character);
+          Gdx.app.postRunnable(() -> {
+            orchestrator.moonlight.addCharacter(msg.character);
+          });
           return;
         }
 
         if (object instanceof Network.UpdateCharacter) {
-//          ui.updateCharacter((Network.UpdateCharacter) object);
+          Network.UpdateCharacter msg = (Network.UpdateCharacter) object;
+          Gdx.app.postRunnable(() -> {
+            System.out.println(msg.facingRight);
+            orchestrator.moonlight.moveCharacter(msg.id, msg.x, msg.y, msg.facingRight);
+          });
           return;
         }
 
@@ -65,35 +74,16 @@ public class NetworkClient {
     Network.Login login = new Network.Login();
     login.name = name;
     client.sendTCP(login);
+  }
 
-    while (true) {
-      int ch;
-      try {
-        ch = System.in.read();
-      } catch (IOException ex) {
-        ex.printStackTrace();
-        break;
-      }
-
-      Network.MoveCharacter msg = new Network.MoveCharacter();
-      switch (ch) {
-        case 'w':
-          msg.y = -1;
-          break;
-        case 's':
-          msg.y = 1;
-          break;
-        case 'a':
-          msg.x = -1;
-          break;
-        case 'd':
-          msg.x = 1;
-          break;
-        default:
-          msg = null;
-      }
-      if (msg != null) client.sendTCP(msg);
-    }
+  public void sendMovement(int id, float x, float y, boolean facingRight) {
+    Network.MoveCharacter msg = new Network.MoveCharacter();
+    msg.id  = id;
+    msg.x = x;
+    msg.y = y;
+    msg.facingRight = facingRight;
+    System.out.println(msg);
+    client.sendTCP(msg);
   }
 
 }
