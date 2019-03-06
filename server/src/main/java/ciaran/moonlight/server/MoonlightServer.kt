@@ -74,8 +74,8 @@ fun makeListener(server: Server, loggedInCharacters: HashSet<Character>) : Liste
         val character = Character()
         character.name = register.name
         character.otherStuff = register.otherStuff
-        character.x = 0
-        character.y = 0
+        character.x = 0f
+        character.y = 0f
         if (!saveCharacter(character)) {
           c.close()
           return
@@ -92,22 +92,26 @@ fun makeListener(server: Server, loggedInCharacters: HashSet<Character>) : Liste
         val msg = obj as Network.MoveCharacter?
 
         // Ignore if invalid move.
-        if (Math.abs(msg!!.x) != 1 && Math.abs(msg.y) != 1) return
+//        if (Math.abs(msg!!.x) != 1 && Math.abs(msg.y) != 1) return
 
         val character = loggedInCharacters
-          .find { candidate -> candidate.id == 1 } ?: return
+          .find { candidate -> candidate.id == msg!!.id } ?: return
 
-        character.x += msg.x
-        character.y += msg.y
+        character.x = msg!!.x
+        character.y = msg.y
+        character.facingRight = msg.facingRight
         if (!saveCharacter(character)) {
+          println("Error: couldn't save")
           c.close()
           return
         }
 
+        println("Going to send out an update")
         val update = Network.UpdateCharacter()
         update.id = character.id
         update.x = character.x
         update.y = character.y
+        update.facingRight = character.facingRight
         server.sendToAllTCP(update)
         return
       }
@@ -129,8 +133,9 @@ internal fun saveCharacter(character: Character): Boolean {
     output = DataOutputStream(FileOutputStream(file))
     output.writeInt(character.id)
     output.writeUTF(character.otherStuff)
-    output.writeInt(character.x)
-    output.writeInt(character.y)
+    output.writeFloat(character.x)
+    output.writeFloat(character.y)
+    output.writeBoolean(character.facingRight)
     return true
   } catch (ex: IOException) {
     ex.printStackTrace()
@@ -154,8 +159,9 @@ private fun loadCharacter(name: String): Character? {
     character.id = input.readInt()
     character.name = name
     character.otherStuff = input.readUTF()
-    character.x = input.readInt()
-    character.y = input.readInt()
+    character.x = input.readFloat()
+    character.y = input.readFloat()
+    character.facingRight = input.readBoolean()
     input.close()
     return character
   } catch (ex: IOException) {

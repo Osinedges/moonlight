@@ -15,6 +15,7 @@ public class Player {
   Sprite playerLeftRegion;
   Sprite player;
 
+  private int id;
   private int xp = 0;
   private int lvl = 1;
   private int hp = 100;
@@ -30,6 +31,14 @@ public class Player {
     playerLeftRegion = playerAtlas.createSprite("playerLeft");
     playerLeftRegion.setSize(WIDTH, HEIGHT);
     player = playerRightRegion;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  public int getId() {
+    return id;
   }
 
   public void setXP(int xp) {
@@ -105,6 +114,10 @@ public class Player {
 
   public float getX() {
     return x;
+  }
+
+  public boolean isFacingRight() {
+    return player == playerRightRegion;
   }
 
   public void move(float deltaTime) {
