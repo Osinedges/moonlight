@@ -1,6 +1,5 @@
 package ciaran.moonlight;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -14,7 +13,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 
 import java.util.Random;
 
@@ -25,14 +23,12 @@ public class Moonlight implements Screen {
   Random rand = new Random();
   private final Orchestrator parent;
   Demon demon;
+  Player player;
 
   SpriteBatch batch;
   SpriteBatch uiBatch;
   ShapeRenderer shapeRenderer;
 
-  Texture playerSpriteRight;
-  Texture playerSpriteLeft;
-  Sprite player;
   Sprite brick;
   Sprite background;
   float ySpeed = 0;
@@ -42,9 +38,6 @@ public class Moonlight implements Screen {
 
   float BACKGROUND_WIDTH;
   float BACKGROUND_HEIGHT;
-
-  int playerXP = 0;
-  int playerLvl = 1;
 
   private OrthographicCamera cam;
 
@@ -69,13 +62,6 @@ public class Moonlight implements Screen {
     shapeRenderer = new ShapeRenderer();
     batch = new SpriteBatch();
     uiBatch = new SpriteBatch();
-
-    playerSpriteRight = new Texture("images/CharFaceRight.png");
-    playerSpriteLeft = new Texture("images/CharFaceLeft.png");
-    player = new Sprite(playerSpriteLeft);
-    player.setSize(2, 3);
-
-
     brick = new Sprite(new Texture("images/brick.png"));
 
     brick.setSize(5, 1);
@@ -97,7 +83,8 @@ public class Moonlight implements Screen {
     jumping = Gdx.audio.newSound(Gdx.files.internal("images/jump.ogg"));
     stepping = Gdx.audio.newSound(Gdx.files.internal("images/stepping.ogg"));
 
-    createDemon();
+    createPlayers();
+    createDemons();
   }
 
   private void createBackground() {
@@ -110,7 +97,11 @@ public class Moonlight implements Screen {
     background.setSize(BACKGROUND_WIDTH * 3, BACKGROUND_HEIGHT);
   }
 
-  private void createDemon() {
+  private void createPlayers() {
+    player = new Player();
+  }
+
+  private void createDemons() {
     demon = new Demon();
   }
 
@@ -137,7 +128,7 @@ public class Moonlight implements Screen {
     background.draw(batch);
 
     if (!paused) {
-      player.draw(batch);
+      player.getSprite().draw(batch);
       demon.getSprite().draw(batch);
       brick.draw(batch);
       pauseDelta = 0;
@@ -149,7 +140,7 @@ public class Moonlight implements Screen {
     }
     batch.end();
 
-    if (getLogicalPlayerRectangle().overlaps(demon.getSprite().getBoundingRectangle())) {
+    if (player.getLogicalBoundingRectangle().overlaps(demon.getSprite().getBoundingRectangle())) {
       Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
       Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
       shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -160,8 +151,8 @@ public class Moonlight implements Screen {
 
 
     uiBatch.begin();
-    font.draw(uiBatch, "Level: " + playerLvl, 10, Gdx.graphics.getHeight() - 8);
-    font.draw(uiBatch, "Experience: " + playerXP, 10, Gdx.graphics.getHeight() - 32);
+    font.draw(uiBatch, "Level: " + player.getLvl(), 10, Gdx.graphics.getHeight() - 8);
+    font.draw(uiBatch, "Experience: " + player.getXp(), 10, Gdx.graphics.getHeight() - 32);
 
     uiBatch.end();
 
@@ -188,7 +179,7 @@ public class Moonlight implements Screen {
   @Override
   public void dispose() {
     batch.dispose();
-    player.getTexture().dispose();
+    player.dispose();
   }
 
   public void handleInput(float deltaTime) {
@@ -213,37 +204,36 @@ public class Moonlight implements Screen {
     }
 
     if (isLeftPressed) {
-      player.setTexture(playerSpriteLeft);
-      player.setX(player.getX() - WALK_SPEED * deltaTime);
+      player.rotateLeft();
+      player.move(deltaTime);
     }
 
     if (isRightPressed) {
-      player.setTexture(playerSpriteRight);
-      player.setX(player.getX() + WALK_SPEED * deltaTime);
+      player.rotateRight();
+      player.move(deltaTime);
     }
 
 
-    player.setY(player.getY() - ySpeed * deltaTime);
+    player.setPosition(player.getX(), player.getY() - ySpeed * deltaTime);
     ySpeed += 80 * deltaTime;
 
     if (player.getY() <= 0) {
-      player.setY(0);
+      player.setPosition(player.getX(), 0);
       ySpeed = 0;
     }
 
-    if (getLogicalPlayerRectangle().overlaps(brick.getBoundingRectangle())) {
-      player.setX(brick.getY() + brick.getHeight());
+    if (player.getLogicalBoundingRectangle().overlaps(brick.getBoundingRectangle())) {
+      player.setPosition(player.getX(), brick.getY() + brick.getHeight());
       ySpeed = 0;
     }
 
     if (isSpacePressed && ySpeed == 0) {
-      jumping.play();
+      jumping.play(0.1f);
       ySpeed -= 50;
     }
 
 
     demonWalk(deltaTime);
-
     cam.position.set(player.getX(), player.getY(), 0);
 
   }
@@ -252,16 +242,6 @@ public class Moonlight implements Screen {
     if (rand.nextInt(100) == 1) {
       demon.rotate();
     }
-  }
-
-  private Rectangle getLogicalPlayerRectangle() {
-    Rectangle visualRectangle = player.getBoundingRectangle();
-    return new Rectangle(
-      visualRectangle.x + 0.5f,
-      visualRectangle.y,
-      visualRectangle.width - 1,
-      visualRectangle.height
-    );
   }
 
 }

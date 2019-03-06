@@ -27,10 +27,6 @@ public class Demon {
     demon = demonRightRegion;
   }
 
-  private void applyCoordinates() {
-    demon.setPosition(x, y);
-  }
-
   public void rotateLeft() {
     demon = demonLeftRegion;
   }
