@@ -1,20 +1,27 @@
 
-demonSword.png
-size: 128,128
+playerAnimations.png
+size: 256,128
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-playerRight
-  rotate: false
-  xy: 2, 138
-  size: 42, 54
-  orig: 42, 54
-  offset: 0, 0
-  index: -1
 playerLeft
   rotate: false
-  xy: 25, 200
-  size: 42, 54
-  orig: 42, 54
+  xy: 2, 2
+  size: 54, 99
+  orig: 54, 99
+  offset: 0, 0
+  index: -1
+playerRight
+  rotate: false
+  xy: 58, 7
+  size: 55, 94
+  orig: 55, 94
+  offset: 0, 0
+  index: -1
+playerDead
+  rotate: false
+  xy: 115, 46
+  size: 94, 55
+  orig: 94, 55
   offset: 0, 0
   index: -1
