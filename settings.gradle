@@ -1,1 +1,2 @@
+include ':server', ':shared'
 include 'desktop', 'android', 'ios', 'html', 'core'
