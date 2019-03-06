@@ -10,13 +10,13 @@ public class Orchestrator extends Game {
   public static final String NAME = "Player " + rand.nextInt(10000);
   public int myId = -1;
 
-  public NetworkClient networkClient;
+//  public NetworkClient networkClient;
   public Moonlight moonlight;
   Screen menu;
 
   @Override
   public void create() {
-    networkClient = new NetworkClient(this, "localhost", Orchestrator.NAME, "test1");
+//    networkClient = new NetworkClient(this, "localhost", Orchestrator.NAME, "test1");
     moonlight = new Moonlight(this);
     menu = new MenuScreen(this);
     setScreen(moonlight);

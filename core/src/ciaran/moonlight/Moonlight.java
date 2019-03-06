@@ -28,8 +28,9 @@ public class Moonlight implements Screen {
   Random rand = new Random();
   private final Orchestrator parent;
   Demon demon;
+  Blob blob;
   Player player;
-  List<Player> otherPlayers = new ArrayList<>();
+//  List<Player> otherPlayers = new ArrayList<>();
 
   SpriteBatch batch;
   SpriteBatch uiBatch;
@@ -91,6 +92,7 @@ public class Moonlight implements Screen {
 
     createPlayers();
     createDemons();
+    createBlobs();
   }
 
   private void createBackground() {
@@ -111,6 +113,10 @@ public class Moonlight implements Screen {
     demon = new Demon();
   }
 
+  private void createBlobs() {
+    blob = new Blob();
+  }
+
   @Override
   public void show() {
     paused = false;
@@ -129,13 +135,14 @@ public class Moonlight implements Screen {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     batch.begin();
 
-    background.setPosition(-BACKGROUND_WIDTH * 1.5f + (player.getX() - player.getX() % BACKGROUND_WIDTH), - 15);
+    background.setPosition(-BACKGROUND_WIDTH * 1.5f + (player.getX() - player.getX() % BACKGROUND_WIDTH), -15);
     background.draw(batch);
 
     if (!paused) {
       player.getSprite().draw(batch);
-      otherPlayers.forEach(player -> player.getSprite().draw(batch));
+//      otherPlayers.forEach(player -> player.getSprite().draw(batch));
       demon.getSprite().draw(batch);
+      blob.getSprite().draw(batch);
       brick.draw(batch);
       pauseDelta = 0;
     } else {
@@ -146,7 +153,8 @@ public class Moonlight implements Screen {
     }
     batch.end();
 
-    if (player.getLogicalBoundingRectangle().overlaps(demon.getSprite().getBoundingRectangle())) {
+    if (player.getLogicalBoundingRectangle().overlaps(demon.getSprite().getBoundingRectangle()) ||
+      player.getLogicalBoundingRectangle().overlaps(blob.getSprite().getBoundingRectangle())) {
       Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
       Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
       shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -155,11 +163,11 @@ public class Moonlight implements Screen {
       shapeRenderer.end();
       player.damage(1);
     }
-      uiBatch.begin();
+    uiBatch.begin();
     font.draw(uiBatch, "Level: " + player.getLvl(), 10, Gdx.graphics.getHeight() - 8);
     font.draw(uiBatch, "Experience: " + player.getXp(), 10, Gdx.graphics.getHeight() - 32);
     font.draw(uiBatch, "Hitpoints: " + player.getHp() + "/100", 10, Gdx.graphics.getHeight() - 56);
-    if(player.isDead()){
+    if (player.isDead()) {
       font.draw(uiBatch, "You Fucking Suck", 50, 50);
     }
     uiBatch.end();
@@ -202,11 +210,10 @@ public class Moonlight implements Screen {
       paused = true;
     }
 
-    if (walking && !isWalkButtonHeld && !player.isDead()){
+    if (walking && !isWalkButtonHeld && !player.isDead()) {
       stepping.stop();
       walking = false;
-    }
-    else if (!walking && isWalkButtonHeld && !player.isDead()) {
+    } else if (!walking && isWalkButtonHeld && !player.isDead()) {
       stepping.loop();
       walking = true;
     }
@@ -244,50 +251,60 @@ public class Moonlight implements Screen {
       ySpeed -= 50;
     }
 
-    if (parent.myId != -1) {
-      parent.networkClient.sendMovement(
-        parent.myId, player.getX(), player.getY(), player.isFacingRight()
-      );
-    }
+//    if (parent.myId != -1) {
+//      parent.networkClient.sendMovement(
+//        parent.myId, player.getX(), player.getY(), player.isFacingRight()
+//      );
+//    }
 
     demonWalk(deltaTime);
+    blobWalk(deltaTime);
     cam.position.set(player.getX(), player.getY(), 0);
   }
 
-  private void demonWalk(float deltaTime){
+  private void demonWalk(float deltaTime) {
     demon.move(deltaTime);
     if (rand.nextInt(100) == 1) {
       demon.rotate();
     }
   }
 
-  public void addCharacter(Character character) {
-    if (character.name.equals(Orchestrator.NAME)) {
-      parent.myId = character.id;
-      return;
+  private void blobWalk(float deltaTime) {
+    blob.move(deltaTime);
+    if (rand.nextInt(100) == 1) {
+      blob.rotate();
     }
-    Player otherPlayer = new Player();
-    otherPlayer.setId(character.id);
-    otherPlayer.setPosition(character.x, character.y);
-    otherPlayers.add(otherPlayer);
-  }
-
-  public void moveCharacter(int id, float x, float y, boolean isFacingRight) {
-    System.out.println(otherPlayers);
-    if (id == parent.myId) {
-      return;
-    }
-
-    otherPlayers
-      .stream().filter(p -> p.getId() == id)
-      .findFirst()
-      .ifPresent(p -> {
-        p.setPosition(x, y);
-        if (isFacingRight) {
-          p.rotateRight();
-        } else {
-          p.rotateLeft();
-        }
-      });
   }
 }
+
+//  public void addCharacter(Character character) {
+//    if (character.name.equals(Orchestrator.NAME)) {
+//      parent.myId = character.id;
+//      return;
+//    }
+//    Player otherPlayer = new Player();
+//    otherPlayer.setId(character.id);
+//    otherPlayer.setPosition(character.x, character.y);
+//    otherPlayers.add(otherPlayer);
+//  }
+//
+//  public void moveCharacter(int id, float x, float y, boolean isFacingRight) {
+//    System.out.println(otherPlayers);
+//    if (id == parent.myId) {
+//      return;
+//    }
+//  }
+//}
+//    otherPlayers
+//      .stream().filter(p -> p.getId() == id)
+//      .findFirst()
+//      .ifPresent(p -> {
+//        p.setPosition(x, y);
+//        if (isFacingRight) {
+//          p.rotateRight();
+//        } else {
+//          p.rotateLeft();
+//        }
+//      });
+//  }
+//}
