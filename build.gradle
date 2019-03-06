@@ -47,6 +47,7 @@ project(":desktop") {
 
   dependencies {
     implementation project(":core")
+    implementation 'com.esotericsoftware:kryonet:2.22.0-RC1'
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
@@ -114,9 +115,11 @@ project(":core") {
 
 
   dependencies {
+    implementation project(":shared")
     implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+    implementation 'com.esotericsoftware:kryonet:2.22.0-RC1'
   }
 }
 
