@@ -3,6 +3,7 @@ package ciaran.moonlight;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -16,8 +17,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
 
-public class Moonlight extends ApplicationAdapter {
+public class Moonlight implements Screen {
   private static final float WALK_SPEED = 20;
+  private final Orchestrator parent;
   Demon demon;
 
   SpriteBatch batch;
@@ -48,23 +50,11 @@ public class Moonlight extends ApplicationAdapter {
   BitmapFont font;
 
   private boolean walking;
+  private boolean paused;
+  private float pauseDelta;
 
-  private void createBackground() {
-    Texture backgroundTexture = new Texture(Gdx.files.internal("images/background.png"));
-    backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-    TextureRegion backgroundTextureRegion = new TextureRegion(backgroundTexture);
-    background = new Sprite(backgroundTextureRegion, 0, 0, 1280 * 3, 1080);
-    BACKGROUND_WIDTH = CAM_WIDTH * 1.5f;
-    BACKGROUND_HEIGHT = CAM_HEIGHT * 1.5f;
-    background.setSize(BACKGROUND_WIDTH * 3, BACKGROUND_HEIGHT);
-  }
-
-  private void createDemon() {
-    demon = new Demon();
-  }
-
-  @Override
-  public void create() {
+  public Moonlight(Orchestrator parent) {
+    this.parent = parent;
     FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Montserrat-Bold.ttf"));
 
     FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -106,10 +96,32 @@ public class Moonlight extends ApplicationAdapter {
     createDemon();
   }
 
+  private void createBackground() {
+    Texture backgroundTexture = new Texture(Gdx.files.internal("images/background.png"));
+    backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+    TextureRegion backgroundTextureRegion = new TextureRegion(backgroundTexture);
+    background = new Sprite(backgroundTextureRegion, 0, 0, 1280 * 3, 1080);
+    BACKGROUND_WIDTH = CAM_WIDTH * 1.5f;
+    BACKGROUND_HEIGHT = CAM_HEIGHT * 1.5f;
+    background.setSize(BACKGROUND_WIDTH * 3, BACKGROUND_HEIGHT);
+  }
+
+  private void createDemon() {
+    demon = new Demon();
+  }
+
   @Override
-  public void render() {
-    handleInput();
-    cam.update();
+  public void show() {
+    paused = false;
+  }
+
+  @Override
+  public void render(float deltaTime) {
+    System.out.println("Handling input" + deltaTime);
+    if (!paused) {
+      handleInput(deltaTime);
+      cam.update();
+    }
 
     batch.setProjectionMatrix(cam.combined);
 
@@ -120,9 +132,17 @@ public class Moonlight extends ApplicationAdapter {
     background.setPosition(-BACKGROUND_WIDTH * 1.5f + (player.getX() - player.getX() % BACKGROUND_WIDTH), - 15);
     background.draw(batch);
 
-    player.draw(batch);
-    demon.getSprite().draw(batch);
-    brick.draw(batch);
+    if (!paused) {
+      player.draw(batch);
+      demon.getSprite().draw(batch);
+      brick.draw(batch);
+      pauseDelta = 0;
+    } else {
+      pauseDelta += deltaTime;
+      if (pauseDelta >= 0.1) {
+        parent.toggleMenu();
+      }
+    }
     batch.end();
 
     if (getLogicalPlayerRectangle().overlaps(demon.getSprite().getBoundingRectangle())) {
@@ -144,19 +164,40 @@ public class Moonlight extends ApplicationAdapter {
   }
 
   @Override
+  public void resize(int width, int height) {
+
+  }
+
+  @Override
+  public void pause() {
+  }
+
+  @Override
+  public void resume() {
+  }
+
+  @Override
+  public void hide() {
+
+  }
+
+  @Override
   public void dispose() {
     batch.dispose();
     player.getTexture().dispose();
   }
 
-  public void handleInput() {
+  public void handleInput(float deltaTime) {
 
-    float deltaTime = Gdx.graphics.getDeltaTime();
     boolean isRightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
     boolean isLeftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
     boolean isSpacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
     boolean isWalkButtonHeld = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
+    boolean escPressed = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE);
+    if (escPressed) {
+      paused = true;
+    }
 
     if (walking && !isWalkButtonHeld){
       stepping.stop();
@@ -207,6 +248,7 @@ public class Moonlight extends ApplicationAdapter {
   private void demonWalk(float deltaTime){
     demon.move(deltaTime);
   }
+
   private Rectangle getLogicalPlayerRectangle() {
     Rectangle visualRectangle = player.getBoundingRectangle();
     return new Rectangle(
