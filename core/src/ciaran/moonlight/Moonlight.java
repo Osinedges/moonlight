@@ -149,7 +149,10 @@ public class Moonlight implements Screen {
     batch.end();
 
     if (player.getLogicalBoundingRectangle().overlaps(demon.getSprite().getBoundingRectangle()) ||
-      player.getLogicalBoundingRectangle().overlaps(blob.getSprite().getBoundingRectangle())) {
+      player.getLogicalBoundingRectangle().overlaps(blob.getSprite().getBoundingRectangle()) ||
+      player.getLogicalBoundingRectangle().overlaps(murderer.getSprite().getBoundingRectangle())
+      )
+    {
       Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
       Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
       shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
