@@ -80,9 +80,6 @@ public class Moonlight implements Screen {
     uiBatch = new SpriteBatch();
     brick = new Sprite(new Texture("images/brick.png"));
 
-    brick.setSize(5, 1);
-    brick.setPosition(10, 10);
-
     float w = Gdx.graphics.getWidth();
     float h = Gdx.graphics.getHeight();
 
@@ -100,6 +97,20 @@ public class Moonlight implements Screen {
     createBlobs();
     createGroundBody();
     createMurderer();
+    createBricks();
+  }
+
+  private void createBricks() {
+    brick.setSize(5, 1);
+    brick.setOriginCenter();
+    brick.setOriginBasedPosition(10, 10);
+    BodyDef groundBodyDef = new BodyDef();
+    groundBodyDef.position.set(new Vector2(10, 10));
+    Body brickBody = world.createBody(groundBodyDef);
+    PolygonShape brickBox = new PolygonShape();
+    brickBox.setAsBox(2.5f, 0.5f);
+    brickBody.createFixture(brickBox, 0.0f);
+    brickBox.dispose();
   }
 
   private void createBackground() {
@@ -201,7 +212,7 @@ public class Moonlight implements Screen {
     uiBatch.end();
 
     doPhysicsStep(deltaTime);
-    debugRenderer.render(world, cam.combined);
+//    debugRenderer.render(world, cam.combined);
   }
 
   private void doPhysicsStep(float deltaTime) {

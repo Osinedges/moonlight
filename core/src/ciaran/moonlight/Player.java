@@ -86,6 +86,7 @@ public class Player {
 
   private void createBody(World world) {
     BodyDef bodyDef = new BodyDef();
+    bodyDef.fixedRotation = true;
     bodyDef.type = BodyDef.BodyType.DynamicBody;
     bodyDef.position.set(new Vector2(0, 10));
 
