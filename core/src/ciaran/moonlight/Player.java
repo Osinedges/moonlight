@@ -7,18 +7,22 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 public class Player {
   private static final float WIDTH = 2;
   private static final float HEIGHT = 3;
-  private static final float MAX_VELOCITY = 10;
+  private static final float MAX_VELOCITY = 20;
 
   TextureAtlas playerAtlas;
 
@@ -82,14 +86,22 @@ public class Player {
 
   private void createBody(World world) {
     BodyDef bodyDef = new BodyDef();
-    bodyDef.position.set(new Vector2(0, 10));
     bodyDef.type = BodyDef.BodyType.DynamicBody;
+    bodyDef.position.set(new Vector2(0, 10));
 
     body = world.createBody(bodyDef);
 
-    CircleShape circle = new CircleShape();
-    circle.setRadius(2f);
-    body.createFixture(circle, 0.0f);
+    PolygonShape shape = new PolygonShape();
+    shape.setAsBox(1, 2);
+
+    FixtureDef fixtureDef = new FixtureDef();
+    fixtureDef.shape = shape;
+    fixtureDef.density = 0.5f;
+    fixtureDef.friction = 0.6f;
+    fixtureDef.restitution = 0.2f; // Make it bounce a little bit
+
+    body.createFixture(fixtureDef);
+    shape.dispose();
   }
 
   public void setId(int id) {
@@ -155,7 +167,7 @@ public class Player {
 
     if (dead) {
       animation = animationDeath;
-    } else if (body.getLinearVelocity().y != 0) {
+    } else if (Math.abs(body.getLinearVelocity().y) >= 2f) {
       animation = animationJump;
     } else if (walking) {
       animation = animationWalk;
@@ -167,7 +179,9 @@ public class Player {
     sprite = new Sprite(keyFrame);
     sprite.flip(!facingRight, false);
     sprite.setSize(6, 6);
-    sprite.setPosition(body.getPosition().x, body.getPosition().y);
+    sprite.setOrigin(3.5f, 3.4f);
+    sprite.setOriginBasedPosition(body.getPosition().x, body.getPosition().y);
+    sprite.setRotation(MathUtils.radiansToDegrees * body.getAngle());
     sprite.draw(batch);
   }
 
@@ -208,15 +222,16 @@ public class Player {
   public void move() {
     Vector2 vel = body.getLinearVelocity();
     Vector2 pos = body.getPosition();
-    body.applyLinearImpulse(-0.80f, 0, pos.x, pos.y, true);
 
     if (!facingRight && vel.x > -MAX_VELOCITY) {
-      body.applyLinearImpulse(-0.80f, 0, pos.x, pos.y, true);
+      body.applyLinearImpulse(new Vector2(-30.00f, 0f), body.getWorldCenter(), true);
     }
 
     if (facingRight && vel.x < MAX_VELOCITY) {
-      body.applyLinearImpulse(0.80f, 0, pos.x, pos.y, true);
+      body.applyLinearImpulse(new Vector2(30.00f, 0f), body.getWorldCenter(), true);
     }
+
+    System.out.println(body.getWorldCenter());
   }
 
   public Rectangle getLogicalBoundingRectangle() {

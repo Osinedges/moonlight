@@ -114,7 +114,7 @@ public class Moonlight implements Screen {
 
   private void createGroundBody() {
     BodyDef groundBodyDef = new BodyDef();
-    groundBodyDef.position.set(new Vector2(-10, 0));
+    groundBodyDef.position.set(new Vector2(-50, 0));
 
     Body groundBody = world.createBody(groundBodyDef);
 
