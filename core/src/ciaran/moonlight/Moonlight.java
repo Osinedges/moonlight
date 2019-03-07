@@ -186,7 +186,7 @@ public class Moonlight implements Screen {
       if (pauseDelta >= 0.1) {
         parent.toggleMenu();
       }
-    }7
+    }
     batch.end();
 
     if (player.getLogicalBoundingRectangle().overlaps(demon.getSprite().getBoundingRectangle()) ||
