@@ -31,6 +31,10 @@ public class Player {
   private TextureAtlas textureAtlas;
   private Animation<TextureRegion> animationWalk;
   private Animation<TextureRegion> animationIdle;
+  private Animation<TextureRegion> animationJump;
+  private Animation<TextureRegion> animationPunchOne;
+  private Animation<TextureRegion> animationPunchTwo;
+  private Animation<TextureRegion> animationDeath;
   private float stateTime;
   private Sprite sprite = new Sprite();
 
@@ -39,13 +43,34 @@ public class Player {
 
   public Player() {
     textureAtlas = new TextureAtlas(Gdx.files.internal("images/character1/player.atlas"));
-    Array<TextureAtlas.AtlasRegion> idleRight = textureAtlas.findRegions("idleRight");
-    Array<TextureAtlas.AtlasRegion> walkRight = textureAtlas.findRegions("walkRight");
-    animationIdle = new Animation<TextureRegion>(1/15f, idleRight);
+    Array<TextureAtlas.AtlasRegion> idle = textureAtlas.findRegions("idle");
+    Array<TextureAtlas.AtlasRegion> walk = textureAtlas.findRegions("walk");
+    Array<TextureAtlas.AtlasRegion> jump = textureAtlas.findRegions("jump");
+    Array<TextureAtlas.AtlasRegion> punchOne= textureAtlas.findRegions("punchOne");
+    Array<TextureAtlas.AtlasRegion> punchTwo = textureAtlas.findRegions("punchTwo");
+    Array<TextureAtlas.AtlasRegion> death = textureAtlas.findRegions("death");
+
+    animationPunchOne = new Animation<TextureRegion>(1/7.5f, punchOne);
+    animationPunchOne.setPlayMode(Animation.PlayMode.LOOP);
+
+    animationPunchTwo = new Animation<TextureRegion>(1/7.5f, punchTwo);
+    animationPunchTwo.setPlayMode(Animation.PlayMode.LOOP);
+
+    animationJump = new Animation<TextureRegion>(1/11.25f, jump);
+    animationJump.setPlayMode(Animation.PlayMode.LOOP);
+
+    animationIdle = new Animation<TextureRegion>(1/15f, idle);
     animationIdle.setPlayMode(Animation.PlayMode.LOOP);
 
-    animationWalk = new Animation<TextureRegion>(1/15f, walkRight);
+    animationWalk = new Animation<TextureRegion>(1/15f, walk);
     animationWalk.setPlayMode(Animation.PlayMode.LOOP);
+
+    animationDeath = new Animation<TextureRegion>(1/15f, death);
+    animationDeath.setPlayMode(Animation.PlayMode.LOOP);
+
+    animationWalk = new Animation<TextureRegion>(1/15f, walk);
+    animationWalk.setPlayMode(Animation.PlayMode.LOOP);
+
 
     jumping = Gdx.audio.newSound(Gdx.files.internal("images/jump.ogg"));
     stepping = Gdx.audio.newSound(Gdx.files.internal("images/stepping.ogg"));
@@ -122,9 +147,15 @@ public class Player {
 
     stateTime += deltaTime;
 
-    Animation<TextureRegion> animation = walking
-      ? animationWalk
-      : animationIdle;
+    Animation<TextureRegion> animation;
+
+    if (ySpeed != 0) {
+      animation = animationJump;
+    } else if (walking) {
+      animation = animationWalk;
+    } else {
+      animation = animationIdle;
+    }
 
     TextureRegion keyFrame = animation.getKeyFrame(stateTime);
     sprite = new Sprite(keyFrame);
@@ -153,6 +184,7 @@ public class Player {
       return;
     }
     jumping.play(0.1f);
+
     ySpeed -= 50;
   }
 
