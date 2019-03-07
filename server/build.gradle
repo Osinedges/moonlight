@@ -1,4 +1,3 @@
-apply plugin: "java"
 apply plugin: 'kotlin'
 apply plugin: 'application'
 
@@ -8,6 +7,15 @@ dependencies {
   implementation fileTree(dir: 'libs', include: ['*.jar'])
   implementation 'com.esotericsoftware:kryonet:2.22.0-RC1'
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+}
+
+kotlin {
+  sourceSets {
+    main {
+      kotlin.srcDir('src')
+      resources.srcDir('res')
+    }
+  }
 }
 
 sourceCompatibility = "8"

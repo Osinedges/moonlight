@@ -35,10 +35,24 @@ public class Network {
     public int id;
     public float x, y;
     public boolean facingRight;
+
+    public UpdateCharacter() {
+    }
+
+    public UpdateCharacter(int id, float x, float y, boolean facingRight) {
+      this.id = id;
+      this.x = x;
+      this.y = y;
+      this.facingRight = facingRight;
+    }
   }
 
   static public class AddCharacter {
     public Character character;
+
+    public AddCharacter(Character character) {
+      this.character = character;
+    }
 
     @Override
     public String toString() {
