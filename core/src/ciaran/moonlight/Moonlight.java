@@ -13,6 +13,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +29,8 @@ import ciaran.moonlight.shared.Character;
 
 
 public class Moonlight implements Screen {
+  private static final float TIME_STEP = 1 / 60f;
+
   Random rand = new Random();
   private final Orchestrator parent;
   Demon demon;
@@ -47,6 +55,9 @@ public class Moonlight implements Screen {
 
   BitmapFont font;
 
+  private float physicsTimeAccumulator = 0;
+  World world;
+  Box2DDebugRenderer debugRenderer;
 
   private boolean paused;
   private float pauseDelta;
@@ -57,6 +68,9 @@ public class Moonlight implements Screen {
 
     FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
     parameter.size = 18;
+
+    world = new World(new Vector2(0, -98f), true);
+    debugRenderer = new Box2DDebugRenderer();
 
     font = generator.generateFont(parameter);
 
@@ -83,6 +97,7 @@ public class Moonlight implements Screen {
     createPlayers();
     createDemons();
     createBlobs();
+    createGroundBody();
   }
 
   private void createBackground() {
@@ -95,8 +110,23 @@ public class Moonlight implements Screen {
     background.setSize(BACKGROUND_WIDTH * 3, BACKGROUND_HEIGHT);
   }
 
+  private void createGroundBody() {
+    BodyDef groundBodyDef = new BodyDef();
+    groundBodyDef.position.set(new Vector2(-10, 0));
+
+    Body groundBody = world.createBody(groundBodyDef);
+
+    // Create a polygon shape
+    PolygonShape groundBox = new PolygonShape();
+    groundBox.setAsBox(100, 1.0f);
+    // Create a fixture from our polygon shape and add it to our ground body
+    groundBody.createFixture(groundBox, 0.0f);
+    // Clean up after ourselves
+    groundBox.dispose();
+  }
+
   private void createPlayers() {
-    player = new Player();
+    player = new Player(world);
   }
 
   private void createDemons() {
@@ -125,7 +155,7 @@ public class Moonlight implements Screen {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     batch.begin();
 
-    background.setPosition(-BACKGROUND_WIDTH * 1.5f + (player.getX() - player.getX() % BACKGROUND_WIDTH), -14);
+    background.setPosition(-BACKGROUND_WIDTH * 1.5f + (player.getX() - player.getX() % BACKGROUND_WIDTH), -14.4f);
     background.draw(batch);
 
     if (!paused) {
@@ -162,6 +192,19 @@ public class Moonlight implements Screen {
     }
     uiBatch.end();
 
+    doPhysicsStep(deltaTime);
+    debugRenderer.render(world, cam.combined);
+  }
+
+  private void doPhysicsStep(float deltaTime) {
+    // fixed time step
+    // max frame time to avoid spiral of death (on slow devices)
+    float frameTime = Math.min(deltaTime, 0.25f);
+    physicsTimeAccumulator += frameTime;
+    while (physicsTimeAccumulator >= TIME_STEP) {
+      world.step(TIME_STEP, 6, 2);
+      physicsTimeAccumulator -= TIME_STEP;
+    }
   }
 
   @Override
@@ -202,20 +245,20 @@ public class Moonlight implements Screen {
 
     if (isLeftPressed && !player.isDead()) {
       player.rotateLeft();
-      player.move(deltaTime);
+      player.move();
     }
 
     if (isRightPressed && !player.isDead()) {
       player.rotateRight();
-      player.move(deltaTime);
+      player.move();
     }
 
     player.setWalking(isWalkButtonHeld);
 
-    if (player.getLogicalBoundingRectangle().overlaps(brick.getBoundingRectangle()) && !player.isDead()) {
-      player.setPosition(player.getX(), brick.getY() + brick.getHeight());
-      player.setySpeed(0);
-    }
+//    if (player.getLogicalBoundingRectangle().overlaps(brick.getBoundingRectangle()) && !player.isDead()) {
+////      player.setPosition(player.getX(), brick.getY() + brick.getHeight());
+//      player.setySpeed(0);
+//    }
 
     if (isSpacePressed) {
       player.jump();

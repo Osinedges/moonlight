@@ -8,13 +8,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
 public class Player {
-  private final float WALK_SPEED = 20;
-
   private static final float WIDTH = 2;
   private static final float HEIGHT = 3;
+  private static final float MAX_VELOCITY = 10;
 
   TextureAtlas playerAtlas;
 
@@ -23,9 +27,6 @@ public class Player {
   private int lvl = 1;
   private int hp = 100;
   private boolean dead = false;
-  private float x;
-  private float y;
-  private float ySpeed;
   private boolean facingRight;
   private boolean walking;
   private TextureAtlas textureAtlas;
@@ -37,11 +38,12 @@ public class Player {
   private Animation<TextureRegion> animationDeath;
   private float stateTime;
   private Sprite sprite = new Sprite();
+  private Body body;
 
   Sound jumping;
   Sound stepping;
 
-  public Player() {
+  public Player(World world) {
     textureAtlas = new TextureAtlas(Gdx.files.internal("images/character1/player.atlas"));
     Array<TextureAtlas.AtlasRegion> idle = textureAtlas.findRegions("idle");
     Array<TextureAtlas.AtlasRegion> walk = textureAtlas.findRegions("walk");
@@ -74,6 +76,20 @@ public class Player {
 
     jumping = Gdx.audio.newSound(Gdx.files.internal("images/jump.ogg"));
     stepping = Gdx.audio.newSound(Gdx.files.internal("images/stepping.ogg"));
+
+    createBody(world);
+  }
+
+  private void createBody(World world) {
+    BodyDef bodyDef = new BodyDef();
+    bodyDef.position.set(new Vector2(0, 10));
+    bodyDef.type = BodyDef.BodyType.DynamicBody;
+
+    body = world.createBody(bodyDef);
+
+    CircleShape circle = new CircleShape();
+    circle.setRadius(2f);
+    body.createFixture(circle, 0.0f);
   }
 
   public void setId(int id) {
@@ -132,26 +148,14 @@ public class Player {
     }
   }
 
-  private void handleMovement(float deltaTime) {
-    ySpeed += 80 * deltaTime;
-    setPosition(getX(), getY() - ySpeed * deltaTime);
-
-    if (getY() <= 0) {
-      setPosition(getX(), 0);
-      ySpeed = 0;
-    }
-  }
-
   public void draw(SpriteBatch batch, float deltaTime) {
-    handleMovement(deltaTime);
-
     stateTime += deltaTime;
 
     Animation<TextureRegion> animation;
 
     if (dead) {
       animation = animationDeath;
-    } else if (ySpeed != 0) {
+    } else if (body.getLinearVelocity().y != 0) {
       animation = animationJump;
     } else if (walking) {
       animation = animationWalk;
@@ -163,7 +167,7 @@ public class Player {
     sprite = new Sprite(keyFrame);
     sprite.flip(!facingRight, false);
     sprite.setSize(6, 6);
-    sprite.setPosition(x, y);
+    sprite.setPosition(body.getPosition().x, body.getPosition().y);
     sprite.draw(batch);
   }
 
@@ -182,38 +186,37 @@ public class Player {
   }
 
   public void jump() {
-    if (ySpeed != 0 || isDead()) {
+    if (isDead()) {
       return;
     }
+    body.applyLinearImpulse(0, body.getMass() * 50, body.getPosition().x, body.getPosition().y, true);
     jumping.play(0.1f);
-
-    ySpeed -= 50;
-  }
-
-  public void setPosition(float x, float y) {
-    this.x = x;
-    this.y = y;
-  }
-
-  public void setySpeed(float ySpeed) {
-    this.ySpeed = ySpeed;
   }
 
   public float getY() {
-    return y;
+    return body.getPosition().y;
   }
 
   public float getX() {
-    return x;
+    return body.getPosition().x;
   }
 
   public boolean isFacingRight() {
     return facingRight;
   }
 
-  public void move(float deltaTime) {
-    float velocity = facingRight ? WALK_SPEED : - WALK_SPEED;
-    setPosition(getX() + velocity * deltaTime, getY());
+  public void move() {
+    Vector2 vel = body.getLinearVelocity();
+    Vector2 pos = body.getPosition();
+    body.applyLinearImpulse(-0.80f, 0, pos.x, pos.y, true);
+
+    if (!facingRight && vel.x > -MAX_VELOCITY) {
+      body.applyLinearImpulse(-0.80f, 0, pos.x, pos.y, true);
+    }
+
+    if (facingRight && vel.x < MAX_VELOCITY) {
+      body.applyLinearImpulse(0.80f, 0, pos.x, pos.y, true);
+    }
   }
 
   public Rectangle getLogicalBoundingRectangle() {
