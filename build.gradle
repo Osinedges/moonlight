@@ -2,12 +2,12 @@ buildscript {
 
 
   repositories {
+    google()
+    jcenter()
     mavenLocal()
     mavenCentral()
     maven { url "https://plugins.gradle.org/m2/" }
     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    jcenter()
-    google()
   }
   dependencies {
     classpath 'org.wisepersist:gwt-gradle-plugin:1.0.6'
@@ -33,6 +33,7 @@ allprojects {
   }
 
   repositories {
+    jcenter()
     mavenLocal()
     mavenCentral()
     google()
@@ -74,7 +75,12 @@ project(":android") {
     natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
     natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
     natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
-
+    implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
   }
 }
 
