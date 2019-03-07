@@ -66,7 +66,7 @@ public class Player {
     animationWalk.setPlayMode(Animation.PlayMode.LOOP);
 
     animationDeath = new Animation<TextureRegion>(1/15f, death);
-    animationDeath.setPlayMode(Animation.PlayMode.LOOP);
+    animationDeath.setPlayMode(Animation.PlayMode.NORMAL);
 
     animationWalk = new Animation<TextureRegion>(1/15f, walk);
     animationWalk.setPlayMode(Animation.PlayMode.LOOP);
@@ -108,7 +108,7 @@ public class Player {
     }
     else{
       dead = true;
-//      player = playerDeadRegion; // TODO
+      stateTime = 0;
     }
   }
 
@@ -149,7 +149,9 @@ public class Player {
 
     Animation<TextureRegion> animation;
 
-    if (ySpeed != 0) {
+    if (dead) {
+      animation = animationDeath;
+    } else if (ySpeed != 0) {
       animation = animationJump;
     } else if (walking) {
       animation = animationWalk;
