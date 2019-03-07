@@ -27,6 +27,7 @@ public class Moonlight implements Screen {
   private final Orchestrator parent;
   Demon demon;
   Blob blob;
+  Murderer murderer;
   Player player;
 //  List<Player> otherPlayers = new ArrayList<>();
 
@@ -83,6 +84,7 @@ public class Moonlight implements Screen {
     createPlayers();
     createDemons();
     createBlobs();
+    createMurderer();
   }
 
   private void createBackground() {
@@ -106,7 +108,9 @@ public class Moonlight implements Screen {
   private void createBlobs() {
     blob = new Blob();
   }
-
+  private void createMurderer() {
+    murderer = new Murderer();
+  }
   @Override
   public void show() {
     paused = false;
@@ -133,6 +137,7 @@ public class Moonlight implements Screen {
 //      otherPlayers.forEach(player -> player.getSprite().draw(batch));
       demon.getSprite().draw(batch);
       blob.getSprite().draw(batch);
+      murderer.getSprite().draw(batch);
       brick.draw(batch);
       pauseDelta = 0;
     } else {
@@ -229,6 +234,8 @@ public class Moonlight implements Screen {
 
     demonWalk(deltaTime);
     blobWalk(deltaTime);
+    murdererWalk(deltaTime);
+
     cam.position.set(player.getX(), player.getY(), 0);
   }
 
@@ -236,6 +243,13 @@ public class Moonlight implements Screen {
     demon.move(deltaTime);
     if (rand.nextInt(100) == 1) {
       demon.rotate();
+    }
+  }
+
+  private void murdererWalk(float deltaTime) {
+    murderer.move(deltaTime);
+    if (rand.nextInt(100) == 1) {
+      murderer.rotate();
     }
   }
 
