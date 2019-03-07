@@ -1,0 +1,271 @@
+Sheet2Right.png
+size: 704,320
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+idleRight
+  rotate: false
+  xy: 1, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+idleRight
+  rotate: false
+  xy: 65, 1
+  size: 64, 64
+  orig: 64, 94
+  offset: 0, 0
+  index: 2
+idleRight
+  rotate: false
+  xy: 129, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+idleRight
+  rotate: false
+  xy: 193, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 4
+ idleRight
+  rotate: false
+  xy: 257, 64
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 5
+idleRight
+  rotate: false
+  xy: 321, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 6
+idleRight
+  rotate: false
+  xy: 385, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 7
+idleRight
+  rotate: false
+  xy: 449, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 8
+walkRight
+  rotate: false
+  xy: 1, 65
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+walkRight
+  rotate: false
+  xy: 65, 65
+  size: 64, 64
+  orig: 64, 64  
+  offset: 0, 0
+  index: 2
+walkRight
+  rotate: false
+  xy: 129, 65
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+walkRight
+  rotate: false
+  xy: 193, 64
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 4
+ walkRight
+  rotate: false
+  xy: 257, 65
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 5
+walkRight
+  rotate: false
+  xy: 321, 65
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 6
+walkRight
+  rotate: false
+  xy: 385, 65
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 7
+walkRight
+  rotate: false
+  xy: 449, 65
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 8
+jumpRight
+  rotate: false
+  xy: 1, 129
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 1
+jumpRight
+  rotate: false
+  xy: 65, 129
+  size: 64, 64
+  orig: 64, 64  
+  offset: 0, 0
+  index: 2
+jumpRightThree
+  rotate: false
+  xy: 129, 129
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 3
+jumpRight
+  rotate: false
+  xy: 193, 129
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 4
+ jumpRight
+  rotate: false
+  xy: 257, 129
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 5
+jumpRight
+  rotate: false
+  xy: 321, 129
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: 6
+punchRightOne
+  rotate: false
+  xy: 1, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+punchRightTwo
+  rotate: false
+  xy: 58, 7
+  size: 64, 64
+  orig: 64, 64  
+  offset: 0, 0
+  index: -1
+punchRightThree
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+punchRightFour
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+punchRightFive
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+punchRightSix
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+punchRightSeven
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+punchRightEight
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+deathRightOne
+  rotate: false
+  xy: 1, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+deathRightTwo
+  rotate: false
+  xy: 58, 7
+  size: 64, 64
+  orig: 64, 64  
+  offset: 0, 0
+  index: -1
+deathRightThree
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+deathRightFour
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+deathRightFive
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+deathRightSix
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+deathRightSeven
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+deathRightEight
+  rotate: false
+  xy: 115, 46
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1

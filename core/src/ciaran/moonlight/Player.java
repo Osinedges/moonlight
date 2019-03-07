@@ -1,8 +1,14 @@
 package ciaran.moonlight;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 
 public class Player {
   private final float WALK_SPEED = 20;
@@ -11,10 +17,6 @@ public class Player {
   private static final float HEIGHT = 3;
 
   TextureAtlas playerAtlas;
-  Sprite playerRightRegion;
-  Sprite playerLeftRegion;
-  Sprite playerDeadRegion;
-  Sprite player;
 
   private int id;
   private int xp = 0;
@@ -23,17 +25,30 @@ public class Player {
   private boolean dead = false;
   private float x;
   private float y;
-  float ySpeed = 0;
+  private float ySpeed;
+  private boolean facingRight;
+  private boolean walking;
+  private TextureAtlas textureAtlas;
+  private Animation<TextureRegion> animationWalk;
+  private Animation<TextureRegion> animationIdle;
+  private float stateTime;
+  private Sprite sprite = new Sprite();
+
+  Sound jumping;
+  Sound stepping;
 
   public Player() {
-    playerAtlas = new TextureAtlas("images/player.atlas");
-    playerRightRegion = playerAtlas.createSprite("playerRight");
-    playerRightRegion.setSize(WIDTH, HEIGHT);
-    playerLeftRegion = playerAtlas.createSprite("playerLeft");
-    playerLeftRegion.setSize(WIDTH, HEIGHT);
-    playerDeadRegion = playerAtlas.createSprite("playerDead");
-    playerDeadRegion.setSize(3.4f, 2);
-    player = playerRightRegion;
+    textureAtlas = new TextureAtlas(Gdx.files.internal("images/character1/player.atlas"));
+    Array<TextureAtlas.AtlasRegion> idleRight = textureAtlas.findRegions("idleRight");
+    Array<TextureAtlas.AtlasRegion> walkRight = textureAtlas.findRegions("walkRight");
+    animationIdle = new Animation<TextureRegion>(1/15f, idleRight);
+    animationIdle.setPlayMode(Animation.PlayMode.LOOP);
+
+    animationWalk = new Animation<TextureRegion>(1/15f, walkRight);
+    animationWalk.setPlayMode(Animation.PlayMode.LOOP);
+
+    jumping = Gdx.audio.newSound(Gdx.files.internal("images/jump.ogg"));
+    stepping = Gdx.audio.newSound(Gdx.files.internal("images/stepping.ogg"));
   }
 
   public void setId(int id) {
@@ -68,7 +83,7 @@ public class Player {
     }
     else{
       dead = true;
-      player = playerDeadRegion;
+//      player = playerDeadRegion; // TODO
     }
   }
 
@@ -76,41 +91,78 @@ public class Player {
     return hp;
   }
 
-  private void applyCoordinates() {
-    player.setPosition(x, y);
-  }
-
   public void rotateLeft() {
-    player = playerLeftRegion;
+    facingRight = false;
   }
 
   public void rotateRight() {
-    player = playerRightRegion;
-  }
-
-  public void jump() {
-
+    facingRight = true;
   }
 
   public void rotate() {
-    if (player == playerLeftRegion) {
-      rotateRight();
+    if (facingRight) {
+      rotateLeft();
     } else {
       rotateLeft();
     }
   }
 
-  public Sprite getSprite() {
-    return player;
+  private void handleMovement(float deltaTime) {
+    ySpeed += 80 * deltaTime;
+    setPosition(getX(), getY() - ySpeed * deltaTime);
+
+    if (getY() <= 0) {
+      setPosition(getX(), 0);
+      ySpeed = 0;
+    }
   }
 
+  public void draw(SpriteBatch batch, float deltaTime) {
+    handleMovement(deltaTime);
+
+    stateTime += deltaTime;
+
+    Animation<TextureRegion> animation = walking
+      ? animationWalk
+      : animationIdle;
+
+    TextureRegion keyFrame = animation.getKeyFrame(stateTime);
+    sprite = new Sprite(keyFrame);
+    sprite.flip(!facingRight, false);
+    sprite.setSize(6, 6);
+    sprite.setPosition(x, y);
+    sprite.draw(batch);
+  }
+
+  public void setWalking(boolean walkingRequested) {
+    if (walking && !walkingRequested && !isDead()) {
+      stepping.stop();
+      walking = false;
+    } else if (!walking && walkingRequested && !isDead()) {
+      stepping.loop();
+      walking = true;
+    }
+    if (isDead()) {
+      stepping.stop();
+      walking = false;
+    }
+  }
+
+  public void jump() {
+    if (ySpeed != 0 || isDead()) {
+      return;
+    }
+    jumping.play(0.1f);
+    ySpeed -= 50;
+  }
 
   public void setPosition(float x, float y) {
     this.x = x;
     this.y = y;
-    playerLeftRegion.setPosition(x, y);
-    playerRightRegion.setPosition(x, y);
-    playerDeadRegion.setPosition(x, y);
+  }
+
+  public void setySpeed(float ySpeed) {
+    this.ySpeed = ySpeed;
   }
 
   public float getY() {
@@ -122,16 +174,16 @@ public class Player {
   }
 
   public boolean isFacingRight() {
-    return player == playerRightRegion;
+    return facingRight;
   }
 
   public void move(float deltaTime) {
-    float velocity = player == playerLeftRegion ? -WALK_SPEED : WALK_SPEED;
+    float velocity = facingRight ? WALK_SPEED : - WALK_SPEED;
     setPosition(getX() + velocity * deltaTime, getY());
   }
 
   public Rectangle getLogicalBoundingRectangle() {
-    Rectangle visualRectangle = player.getBoundingRectangle();
+    Rectangle visualRectangle = sprite.getBoundingRectangle();
     return new Rectangle(
       visualRectangle.x + 0.5f,
       visualRectangle.y,

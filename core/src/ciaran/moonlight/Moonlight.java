@@ -23,8 +23,6 @@ import ciaran.moonlight.shared.Character;
 
 
 public class Moonlight implements Screen {
-  private static final float WALK_SPEED = 20;
-
   Random rand = new Random();
   private final Orchestrator parent;
   Demon demon;
@@ -38,7 +36,6 @@ public class Moonlight implements Screen {
 
   Sprite brick;
   Sprite background;
-  float ySpeed = 0;
 
   float CAM_WIDTH;
   float CAM_HEIGHT;
@@ -48,12 +45,9 @@ public class Moonlight implements Screen {
 
   private OrthographicCamera cam;
 
-  Sound jumping;
-  Sound stepping;
-
   BitmapFont font;
 
-  private boolean walking;
+
   private boolean paused;
   private float pauseDelta;
 
@@ -85,10 +79,6 @@ public class Moonlight implements Screen {
     cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
     cam.update();
     createBackground();
-
-
-    jumping = Gdx.audio.newSound(Gdx.files.internal("images/jump.ogg"));
-    stepping = Gdx.audio.newSound(Gdx.files.internal("images/stepping.ogg"));
 
     createPlayers();
     createDemons();
@@ -135,11 +125,11 @@ public class Moonlight implements Screen {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     batch.begin();
 
-    background.setPosition(-BACKGROUND_WIDTH * 1.5f + (player.getX() - player.getX() % BACKGROUND_WIDTH), -15);
+    background.setPosition(-BACKGROUND_WIDTH * 1.5f + (player.getX() - player.getX() % BACKGROUND_WIDTH), -14);
     background.draw(batch);
 
     if (!paused) {
-      player.getSprite().draw(batch);
+      player.draw(batch, deltaTime);
 //      otherPlayers.forEach(player -> player.getSprite().draw(batch));
       demon.getSprite().draw(batch);
       blob.getSprite().draw(batch);
@@ -210,18 +200,6 @@ public class Moonlight implements Screen {
       paused = true;
     }
 
-    if (walking && !isWalkButtonHeld && !player.isDead()) {
-      stepping.stop();
-      walking = false;
-    } else if (!walking && isWalkButtonHeld && !player.isDead()) {
-      stepping.loop();
-      walking = true;
-    }
-    if (player.isDead()) {
-      stepping.stop();
-      walking = false;
-    }
-
     if (isLeftPressed && !player.isDead()) {
       player.rotateLeft();
       player.move(deltaTime);
@@ -232,23 +210,15 @@ public class Moonlight implements Screen {
       player.move(deltaTime);
     }
 
-
-    player.setPosition(player.getX(), player.getY() - ySpeed * deltaTime);
-    ySpeed += 80 * deltaTime;
-
-    if (player.getY() <= 0) {
-      player.setPosition(player.getX(), 0);
-      ySpeed = 0;
-    }
+    player.setWalking(isWalkButtonHeld);
 
     if (player.getLogicalBoundingRectangle().overlaps(brick.getBoundingRectangle()) && !player.isDead()) {
       player.setPosition(player.getX(), brick.getY() + brick.getHeight());
-      ySpeed = 0;
+      player.setySpeed(0);
     }
 
-    if (isSpacePressed && ySpeed == 0 && !player.isDead()) {
-      jumping.play(0.1f);
-      ySpeed -= 50;
+    if (isSpacePressed) {
+      player.jump();
     }
 
 //    if (parent.myId != -1) {
