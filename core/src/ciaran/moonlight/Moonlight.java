@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -30,12 +31,13 @@ import ciaran.moonlight.shared.Character;
 
 public class Moonlight implements Screen {
   private static final float TIME_STEP = 1 / 60f;
+  private static final int NUMBER_OF_MONSTERS = 1;
 
   Random rand = new Random();
   private final Orchestrator parent;
-  Demon demon;
-  Blob blob;
-  Murderer murderer;
+
+  List<Monster> monsters = new ArrayList<>();
+
   Player player;
 //  List<Player> otherPlayers = new ArrayList<>();
 
@@ -143,14 +145,16 @@ public class Moonlight implements Screen {
   }
 
   private void createDemons() {
-    demon = new Demon();
+    for (int i = 0; i < NUMBER_OF_MONSTERS; i++) {
+      monsters.add(new Monster(2, 3, "images/demonSword.atlas", "demonRight", "demonLeft"));
+    }
   }
 
   private void createBlobs() {
-    blob = new Blob();
+    monsters.add(new Monster(2, 3, "images/blob.atlas", "blobRight", "blobLeft"));
   }
   private void createMurderer() {
-    murderer = new Murderer();
+    monsters.add(new Monster(4, 6, "images/murder/murder.atlas", "murdererRight", "murdererLeft"));
   }
   @Override
   public void show() {
@@ -176,9 +180,14 @@ public class Moonlight implements Screen {
     if (!paused) {
       player.draw(batch, deltaTime);
 //      otherPlayers.forEach(player -> player.getSprite().draw(batch));
-      demon.getSprite().draw(batch);
-      blob.getSprite().draw(batch);
-      murderer.getSprite().draw(batch);
+
+      monsters.forEach(monster -> monster.getSprite().draw(batch));
+
+//      for (int i = 0; i < monsters.size(); i++) {
+//        Monster monster = monsters.get(i);
+//        monster.getSprite().draw(batch);
+//      }
+
       brick.draw(batch);
       pauseDelta = 0;
     } else {
@@ -189,10 +198,13 @@ public class Moonlight implements Screen {
     }
     batch.end();
 
-    if (player.getLogicalBoundingRectangle().overlaps(demon.getSprite().getBoundingRectangle()) ||
-      player.getLogicalBoundingRectangle().overlaps(blob.getSprite().getBoundingRectangle()) ||
-      player.getLogicalBoundingRectangle().overlaps(murderer.getSprite().getBoundingRectangle())
-      )
+    boolean overlappingAMonster = monsters
+      .stream()
+      .anyMatch(monster ->
+        monster.getSprite().getBoundingRectangle().overlaps(player.getLogicalBoundingRectangle())
+      );
+
+    if (overlappingAMonster)
     {
       Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
       Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -255,6 +267,7 @@ public class Moonlight implements Screen {
     boolean isRightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
     boolean isLeftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
     boolean isSpacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
+    boolean isAPressed = Gdx.input.isKeyPressed(Input.Keys.A);
     boolean isWalkButtonHeld = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
 
     boolean escPressed = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE);
@@ -267,10 +280,27 @@ public class Moonlight implements Screen {
       player.move();
     }
 
+    if (isAPressed){
+      player.currentlyPunching(true);
+
+      Rectangle punchBox = player.getPunchBox();
+      monsters.forEach(monster -> {
+        if (punchBox.overlaps(monster.getSprite().getBoundingRectangle())) {
+          float kickback = player.isFacingRight() ? 2 : - 2;
+          monster.setPosition(monster.getX() + kickback, monster.getY());
+        }
+      });
+
+      // code here please
+    }
+
     if (isRightPressed && !player.isDead()) {
       player.rotateRight();
       player.move();
     }
+//    if (isAPressed){
+//      player.punch();
+//    }
 
     player.setWalking(isWalkButtonHeld);
 
@@ -289,32 +319,18 @@ public class Moonlight implements Screen {
 //      );
 //    }
 
-    demonWalk(deltaTime);
-    blobWalk(deltaTime);
-    murdererWalk(deltaTime);
+    monstersWalk(deltaTime);
 
     cam.position.set(player.getX(), player.getY(), 0);
   }
 
-  private void demonWalk(float deltaTime) {
-    demon.move(deltaTime);
-    if (rand.nextInt(100) == 1) {
-      demon.rotate();
-    }
-  }
-
-  private void murdererWalk(float deltaTime) {
-    murderer.move(deltaTime);
-    if (rand.nextInt(100) == 1) {
-      murderer.rotate();
-    }
-  }
-
-  private void blobWalk(float deltaTime) {
-    blob.move(deltaTime);
-    if (rand.nextInt(100) == 1) {
-      blob.rotate();
-    }
+  private void monstersWalk(float deltaTime) {
+    monsters.forEach(monster -> {
+      monster.move(deltaTime);
+      if (rand.nextInt(100) == 1) {
+        monster.rotate();
+      }
+    });
   }
 }
 

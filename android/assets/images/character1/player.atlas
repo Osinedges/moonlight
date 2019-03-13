@@ -14,7 +14,7 @@ idle
   rotate: false
   xy: 65, 1
   size: 64, 64
-  orig: 64, 94
+  orig: 64, 64
   offset: 0, 0
   index: 2
 idle
@@ -184,7 +184,7 @@ punchOne
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
-  index: -4
+  index: 4
 punchTwo
   rotate: false
   xy: 257, 193

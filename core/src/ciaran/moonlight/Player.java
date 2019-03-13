@@ -33,6 +33,8 @@ public class Player {
   private boolean dead = false;
   private boolean facingRight;
   private boolean walking;
+  private boolean punching;
+  private boolean punchCounter;
   private TextureAtlas textureAtlas;
   private Animation<TextureRegion> animationWalk;
   private Animation<TextureRegion> animationIdle;
@@ -56,10 +58,10 @@ public class Player {
     Array<TextureAtlas.AtlasRegion> punchTwo = textureAtlas.findRegions("punchTwo");
     Array<TextureAtlas.AtlasRegion> death = textureAtlas.findRegions("death");
 
-    animationPunchOne = new Animation<TextureRegion>(1/7.5f, punchOne);
+    animationPunchOne = new Animation<TextureRegion>(1/11.25f, punchOne);
     animationPunchOne.setPlayMode(Animation.PlayMode.LOOP);
 
-    animationPunchTwo = new Animation<TextureRegion>(1/7.5f, punchTwo);
+    animationPunchTwo = new Animation<TextureRegion>(1/11.25f, punchTwo);
     animationPunchTwo.setPlayMode(Animation.PlayMode.LOOP);
 
     animationJump = new Animation<TextureRegion>(1/11.25f, jump);
@@ -124,6 +126,13 @@ public class Player {
     return dead;
   }
 
+  public void currentlyPunching(boolean punchNow){
+    if (punchNow && !punching) {
+      stateTime = 0;
+    }
+    punching = punchNow;
+  }
+
   public void setLvl(int lvl) {
     this.lvl = lvl;
   }
@@ -168,12 +177,21 @@ public class Player {
 
     if (dead) {
       animation = animationDeath;
+    } else if (punching && punchCounter) {
+      animation = animationPunchOne;
+    } else if (punching) {
+      animation = animationPunchTwo;
     } else if (Math.abs(body.getLinearVelocity().y) >= 2f) {
       animation = animationJump;
     } else if (walking) {
       animation = animationWalk;
     } else {
       animation = animationIdle;
+    }
+
+    if (punching && animation.isAnimationFinished(stateTime)) {
+      punching = false;
+      punchCounter = !punchCounter;
     }
 
     TextureRegion keyFrame = animation.getKeyFrame(stateTime);
@@ -243,6 +261,18 @@ public class Player {
       visualRectangle.width - 1,
       visualRectangle.height
     );
+  }
+
+  public Rectangle getPunchBox() {
+    float halfWidth = getLogicalBoundingRectangle().width / 2;
+
+    Rectangle punchBox = new Rectangle();
+    punchBox.x = getLogicalBoundingRectangle().x + (facingRight ? halfWidth : - halfWidth);
+    punchBox.y = getLogicalBoundingRectangle().y;
+    punchBox.width = getLogicalBoundingRectangle().width;
+    punchBox.height = getLogicalBoundingRectangle().height;
+
+    return punchBox;
   }
 
   public void dispose() {
