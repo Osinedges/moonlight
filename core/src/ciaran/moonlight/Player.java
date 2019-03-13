@@ -3,6 +3,7 @@ package ciaran.moonlight;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -170,7 +171,7 @@ public class Player {
     }
   }
 
-  public void draw(SpriteBatch batch, float deltaTime) {
+  public void draw(SpriteBatch batch, BitmapFont font, float deltaTime) {
     stateTime += deltaTime;
 
     Animation<TextureRegion> animation;
@@ -201,6 +202,7 @@ public class Player {
     sprite.setOrigin(3.5f, 3.4f);
     sprite.setOriginBasedPosition(body.getPosition().x, body.getPosition().y);
     sprite.setRotation(MathUtils.radiansToDegrees * body.getAngle());
+//    font.draw(batch, "Player 1", getX(), getY() + 2);
     sprite.draw(batch);
   }
 

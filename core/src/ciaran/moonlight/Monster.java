@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 public class Monster {
   private final float WALK_SPEED = 10;
 
+  private Moonlight world;
   private final float width;
   private float height;
   TextureAtlas monsterAtlas;
@@ -18,11 +19,13 @@ public class Monster {
   private int hp = 100;
   boolean isDead;
 
-  public Monster(float width,
+  public Monster(Moonlight world,
+                 float width,
                  float height,
                  String atlas,
                  String rightSprite,
                  String leftSprite) {
+    this.world = world;
     this.width = width;
     this.height = height;
     monsterAtlas = new TextureAtlas(atlas);
@@ -66,6 +69,7 @@ public class Monster {
     isDead = true;
     monsterLeftRegion.setSize(monsterLeftRegion.getWidth(), monsterLeftRegion.getHeight() / 2);
     monsterRightRegion.setSize(monsterRightRegion.getWidth(), monsterRightRegion.getHeight() / 2);
+    world.dropItem(new StaticItem(x, y, 1, 1, "images/items/skull.png"));
   }
 
   public Sprite getSprite() {

@@ -37,6 +37,7 @@ public class Moonlight implements Screen {
   private final Orchestrator parent;
 
   List<Monster> monsters = new ArrayList<>();
+  List<StaticItem> items = new ArrayList<>();
 
   Player player;
 //  List<Player> otherPlayers = new ArrayList<>();
@@ -72,6 +73,7 @@ public class Moonlight implements Screen {
     FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
     parameter.size = 18;
 
+
     world = new World(new Vector2(0, -98f), true);
     debugRenderer = new Box2DDebugRenderer();
 
@@ -100,6 +102,11 @@ public class Moonlight implements Screen {
     createGroundBody();
     createMurderer();
     createBricks();
+    createItems();
+  }
+
+  private void createItems() {
+    items.add(new StaticItem(5, 0, 1, 1, "images/items/fish.png"));
   }
 
   private void createBricks() {
@@ -146,15 +153,15 @@ public class Moonlight implements Screen {
 
   private void createDemons() {
     for (int i = 0; i < NUMBER_OF_MONSTERS; i++) {
-      monsters.add(new Monster(2, 3, "images/demonSword.atlas", "demonRight", "demonLeft"));
+      monsters.add(new Monster(this, 2, 3, "images/demonSword.atlas", "demonRight", "demonLeft"));
     }
   }
 
   private void createBlobs() {
-    monsters.add(new Monster(2, 3, "images/blob.atlas", "blobRight", "blobLeft"));
+    monsters.add(new Monster(this, 2, 3, "images/blob.atlas", "blobRight", "blobLeft"));
   }
   private void createMurderer() {
-    monsters.add(new Monster(4, 6, "images/murder/murder.atlas", "murdererRight", "murdererLeft"));
+    monsters.add(new Monster(this, 4, 6, "images/murder/murder.atlas", "murdererRight", "murdererLeft"));
   }
   @Override
   public void show() {
@@ -178,10 +185,11 @@ public class Moonlight implements Screen {
     background.draw(batch);
 
     if (!paused) {
-      player.draw(batch, deltaTime);
+      player.draw(batch, font, deltaTime);
 //      otherPlayers.forEach(player -> player.getSprite().draw(batch));
 
       monsters.forEach(monster -> monster.getSprite().draw(batch));
+      items.forEach(item -> item.getSprite().draw(batch));
 
 //      for (int i = 0; i < monsters.size(); i++) {
 //        Monster monster = monsters.get(i);
@@ -333,6 +341,10 @@ public class Moonlight implements Screen {
         monster.rotate();
       }
     });
+  }
+
+  public void dropItem(StaticItem newItem) {
+    items.add(newItem);
   }
 }
 
