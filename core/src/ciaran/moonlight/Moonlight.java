@@ -106,7 +106,6 @@ public class Moonlight implements Screen {
   }
 
   private void createItems() {
-    items.add(new StaticItem(5, 0, 1, 1, "images/items/fish.png"));
   }
 
   private void createBricks() {
@@ -294,7 +293,7 @@ public class Moonlight implements Screen {
 
       Rectangle punchBox = player.getPunchBox();
       monsters.forEach(monster -> {
-        if (punchBox.overlaps(monster.getSprite().getBoundingRectangle())) {
+        if (!monster.isDead && punchBox.overlaps(monster.getSprite().getBoundingRectangle())) {
           float kickback = player.isFacingRight() ? 2 : - 2;
           monster.setPosition(monster.getX() + kickback, monster.getY());
           monster.takeDamage(20);
