@@ -200,6 +200,7 @@ public class Moonlight implements Screen {
 
     boolean overlappingAMonster = monsters
       .stream()
+      .filter(monster -> !monster.isDead)
       .anyMatch(monster ->
         monster.getSprite().getBoundingRectangle().overlaps(player.getLogicalBoundingRectangle())
       );
@@ -288,6 +289,7 @@ public class Moonlight implements Screen {
         if (punchBox.overlaps(monster.getSprite().getBoundingRectangle())) {
           float kickback = player.isFacingRight() ? 2 : - 2;
           monster.setPosition(monster.getX() + kickback, monster.getY());
+          monster.takeDamage(20);
         }
       });
 

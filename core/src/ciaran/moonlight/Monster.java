@@ -7,7 +7,7 @@ public class Monster {
   private final float WALK_SPEED = 10;
 
   private final float width;
-  private final float height;
+  private float height;
   TextureAtlas monsterAtlas;
   Sprite monsterRightRegion;
   Sprite monsterLeftRegion;
@@ -15,7 +15,8 @@ public class Monster {
 
   private float x;
   private float y;
-  private int hp;
+  private int hp = 100;
+  boolean isDead;
 
   public Monster(float width,
                  float height,
@@ -41,11 +42,30 @@ public class Monster {
   }
 
   public void rotate() {
+    if (isDead) {
+      return;
+    }
     if (monster == monsterLeftRegion) {
       rotateRight();
     } else {
       rotateLeft();
     }
+  }
+
+  public void takeDamage(int damage) {
+    if (isDead) {
+      return;
+    }
+    hp = hp - damage;
+    if (hp <= 0) {
+      die();
+    }
+  }
+
+  public void die() {
+    isDead = true;
+    monsterLeftRegion.setSize(monsterLeftRegion.getWidth(), monsterLeftRegion.getHeight() / 2);
+    monsterRightRegion.setSize(monsterRightRegion.getWidth(), monsterRightRegion.getHeight() / 2);
   }
 
   public Sprite getSprite() {
@@ -68,7 +88,10 @@ public class Monster {
   }
 
   public void move(float deltaTime) {
-    float velocity = monster == monsterLeftRegion ? - WALK_SPEED : WALK_SPEED;
+    if (isDead) {
+      return;
+    }
+    float velocity = monster == monsterLeftRegion ? -WALK_SPEED : WALK_SPEED;
     setPosition(getX() + velocity * deltaTime, getY());
   }
 }
