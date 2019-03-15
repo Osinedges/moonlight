@@ -191,7 +191,7 @@ public class Moonlight implements Screen {
       player.draw(batch, font, deltaTime);
 //      otherPlayers.forEach(player -> player.getSprite().draw(batch));
 
-      monsters.forEach(monster -> monster.draw(batch,deltaTime).draw(batch));
+      monsters.forEach(monster -> monster.draw(batch,deltaTime));
       items.forEach(item -> item.getSprite().draw(batch));
 
 //      for (int i = 0; i < monsters.size(); i++) {

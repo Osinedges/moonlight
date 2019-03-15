@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 
@@ -118,6 +119,16 @@ public class Monster {
     } else {
       rotateLeft();
     }
+  }
+
+  public Rectangle getBoundingRectangle() {
+    Rectangle visualRectangle = sprite.getBoundingRectangle();
+    return new Rectangle(
+      visualRectangle.x + 0.5f,
+      visualRectangle.y,
+      visualRectangle.width - 1,
+      visualRectangle.height
+    );
   }
 
   public void takeDamage(int damage) {
