@@ -191,7 +191,7 @@ public class Moonlight implements Screen {
       player.draw(batch, font, deltaTime);
 //      otherPlayers.forEach(player -> player.getSprite().draw(batch));
 
-      monsters.forEach(monster -> monster.getSprite().draw(batch));
+      monsters.forEach(monster -> monster.draw(batch,deltaTime).draw(batch));
       items.forEach(item -> item.getSprite().draw(batch));
 
 //      for (int i = 0; i < monsters.size(); i++) {
@@ -213,7 +213,7 @@ public class Moonlight implements Screen {
       .stream()
       .filter(monster -> !monster.isDead)
       .anyMatch(monster ->
-        monster.getSprite().getBoundingRectangle().overlaps(player.getLogicalBoundingRectangle())
+        monster.draw(batch,deltaTime).getBoundingRectangle().overlaps(player.getLogicalBoundingRectangle())
       );
 
     if (overlappingAMonster)
