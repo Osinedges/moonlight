@@ -1,7 +1,12 @@
 package ciaran.moonlight;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 
 public class Monster {
   private final float WALK_SPEED = 10;
@@ -14,6 +19,15 @@ public class Monster {
   Sprite monsterLeftRegion;
   Sprite monster;
 
+  private TextureAtlas textureAtlas;
+  private Animation<TextureRegion> animationWalk;
+  private Animation<TextureRegion> animationIdle;
+  private Animation<TextureRegion> animationAttack;
+  private Animation<TextureRegion> animationDeath;
+  private float stateTime;
+  private Sprite sprite = new Sprite();
+  private Body body;
+
   private float x;
   private float y;
   private int hp = 100;
@@ -23,17 +37,38 @@ public class Monster {
                  float width,
                  float height,
                  String atlas,
-                 String rightSprite,
-                 String leftSprite) {
+                 String walk,
+                 String idle,
+                 String attack,
+                 String death) {
+    textureAtlas = new TextureAtlas(Gdx.files.internal(atlas));
+    Array<TextureAtlas.AtlasRegion> Walk = textureAtlas.findRegions(walk);
+    Array<TextureAtlas.AtlasRegion> Idle = textureAtlas.findRegions(idle);
+    Array<TextureAtlas.AtlasRegion> Attack= textureAtlas.findRegions(attack);
+    Array<TextureAtlas.AtlasRegion> Death = textureAtlas.findRegions(death);
+
+    animationAttack = new Animation<TextureRegion>(1/11.25f, Attack);
+    animationAttack.setPlayMode(Animation.PlayMode.LOOP);
+
+    animationIdle = new Animation<TextureRegion>(1/15f, Idle);
+    animationIdle.setPlayMode(Animation.PlayMode.LOOP);
+
+    animationWalk = new Animation<TextureRegion>(1/15f, Walk);
+    animationWalk.setPlayMode(Animation.PlayMode.LOOP);
+
+    animationDeath = new Animation<TextureRegion>(1/15f, Death);
+    animationDeath.setPlayMode(Animation.PlayMode.NORMAL);
+
+
     this.world = world;
     this.width = width;
     this.height = height;
-    monsterAtlas = new TextureAtlas(atlas);
-    monsterRightRegion = monsterAtlas.createSprite(rightSprite);
-    monsterRightRegion.setSize(width, height);
-    monsterLeftRegion = monsterAtlas.createSprite(leftSprite);
-    monsterLeftRegion.setSize(width, height);
-    monster = monsterRightRegion;
+//    monsterAtlas = new TextureAtlas(atlas);
+////    monsterRightRegion = monsterAtlas.createSprite(rightSprite);
+//    monsterRightRegion.setSize(width, height);
+////    monsterLeftRegion = monsterAtlas.createSprite(leftSprite);
+//    monsterLeftRegion.setSize(width, height);
+//    monster = monsterRightRegion;
   }
 
   public void rotateLeft() {
@@ -79,8 +114,6 @@ public class Monster {
   public void setPosition(float x, float y) {
     this.x = x;
     this.y = y;
-    monsterLeftRegion.setPosition(x, y);
-    monsterRightRegion.setPosition(x, y);
   }
 
   public float getY() {

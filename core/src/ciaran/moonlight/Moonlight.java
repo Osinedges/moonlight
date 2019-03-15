@@ -97,12 +97,13 @@ public class Moonlight implements Screen {
     createBackground();
 
     createPlayers();
-    createDemons();
-    createBlobs();
+//    createDemons();
+//    createBlobs();
     createGroundBody();
-    createMurderer();
+//    createMurderer();
     createBricks();
     createItems();
+    createZombie();
   }
 
   private void createItems() {
@@ -150,17 +151,20 @@ public class Moonlight implements Screen {
     player = new Player(world);
   }
 
-  private void createDemons() {
-    for (int i = 0; i < NUMBER_OF_MONSTERS; i++) {
-      monsters.add(new Monster(this, 2, 3, "images/demonSword.atlas", "demonRight", "demonLeft"));
-    }
-  }
-
-  private void createBlobs() {
-    monsters.add(new Monster(this, 2, 3, "images/blob.atlas", "blobRight", "blobLeft"));
-  }
-  private void createMurderer() {
-    monsters.add(new Monster(this, 4, 6, "images/murder/murder.atlas", "murdererRight", "murdererLeft"));
+//  private void createDemons() {
+//    for (int i = 0; i < NUMBER_OF_MONSTERS; i++) {
+//      monsters.add(new Monster(this, 2, 3, "images/demonSword.atlas", "demonRight", "demonLeft"));
+//    }
+//  }
+//
+//  private void createBlobs() {
+//    monsters.add(new Monster(this, 2, 3, "images/blob.atlas", "blobRight", "blobLeft"));
+//  }
+//  private void createMurderer() {
+//    monsters.add(new Monster(this, 4, 6, "images/murder/murder.atlas", "murdererRight", "murdererLeft"));
+//  }
+  private void createZombie() {
+    monsters.add(new Monster(this, 3, 3, "images/zombie/zombie.atlas", "walk", "idle", "attack", "death"));
   }
   @Override
   public void show() {
