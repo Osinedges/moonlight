@@ -121,7 +121,7 @@ public class Monster {
     }
   }
 
-  public Rectangle getBoundingRectangle() {
+  public Rectangle getLogicalBoundingRectangle() {
     Rectangle visualRectangle = sprite.getBoundingRectangle();
     return new Rectangle(
       visualRectangle.x + 0.5f,
