@@ -2,14 +2,12 @@ package ciaran.moonlight;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 
 public class Monster {
@@ -30,13 +28,14 @@ public class Monster {
   private Animation<TextureRegion> animationDeath;
   private float stateTime;
   private Sprite sprite = new Sprite();
-  private Body body;
 
   private float x;
   private float y;
   private int hp = 100;
   boolean isDead;
   boolean isAttacking;
+  private boolean walking;
+  private boolean facingRight;
 
   public Monster(Moonlight world,
                  float width,
@@ -82,6 +81,8 @@ public class Monster {
 
     if (isDead) {
       animation = animationDeath;
+    } else if (walking) {
+      animation = animationWalk;
     }
     else {
       animation = animationIdle;
@@ -93,31 +94,25 @@ public class Monster {
 
     TextureRegion keyFrame = animation.getKeyFrame(stateTime);
     sprite = new Sprite(keyFrame);
-//    sprite.flip(!facingRight, false);
-    sprite.setSize(6, 6);
-    sprite.setOrigin(3.5f, 3.4f);
-    sprite.setOriginBasedPosition(body.getPosition().x, body.getPosition().y);
-    sprite.setRotation(MathUtils.radiansToDegrees * body.getAngle());
-//    font.draw(batch, "Player 1", getX(), getY() + 2);
+    sprite.flip(!facingRight, false);
+    sprite.setSize(width, height);
+    sprite.setPosition(x, y);
     sprite.draw(batch);
   }
 
   public void rotateLeft() {
-    monster = monsterLeftRegion;
+    facingRight = false;
   }
 
   public void rotateRight() {
-    monster = monsterRightRegion;
+    facingRight = true;
   }
 
   public void rotate() {
-    if (isDead) {
-      return;
-    }
-    if (monster == monsterLeftRegion) {
-      rotateRight();
-    } else {
+    if (facingRight) {
       rotateLeft();
+    } else {
+      rotateRight();
     }
   }
 
@@ -166,7 +161,8 @@ public class Monster {
     if (isDead) {
       return;
     }
-    float velocity = monster == monsterLeftRegion ? -WALK_SPEED : WALK_SPEED;
+    float velocity = facingRight ? WALK_SPEED : - WALK_SPEED;
     setPosition(getX() + velocity * deltaTime, getY());
+    walking = true;
   }
 }

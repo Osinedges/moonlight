@@ -167,7 +167,7 @@ public class Player {
     if (facingRight) {
       rotateLeft();
     } else {
-      rotateLeft();
+      rotateRight();
     }
   }
 

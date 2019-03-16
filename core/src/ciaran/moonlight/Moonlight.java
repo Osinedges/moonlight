@@ -164,7 +164,7 @@ public class Moonlight implements Screen {
 //    monsters.add(new Monster(this, 4, 6, "images/murder/murder.atlas", "murdererRight", "murdererLeft"));
 //  }
   private void createZombie() {
-    monsters.add(new Monster(this, 3, 3, "images/zombie/zombie.atlas", "walk", "idle", "attack", "death"));
+    monsters.add(new Monster(this, 4, 5, "images/zombie/zombie.atlas", "walk", "idle", "attack", "death"));
   }
   @Override
   public void show() {
@@ -213,7 +213,7 @@ public class Moonlight implements Screen {
       .stream()
       .filter(monster -> !monster.isDead)
       .anyMatch(monster ->
-        monster.draw(batch,deltaTime).getBoundingRectangle().overlaps(player.getLogicalBoundingRectangle())
+        monster.getLogicalBoundingRectangle().overlaps(player.getLogicalBoundingRectangle())
       );
 
     if (overlappingAMonster)
@@ -297,7 +297,7 @@ public class Moonlight implements Screen {
 
       Rectangle punchBox = player.getPunchBox();
       monsters.forEach(monster -> {
-        if (!monster.isDead && punchBox.overlaps(monster.getSprite().getBoundingRectangle())) {
+        if (!monster.isDead && punchBox.overlaps(monster.getLogicalBoundingRectangle())) {
           float kickback = player.isFacingRight() ? 2 : - 2;
           monster.setPosition(monster.getX() + kickback, monster.getY());
           monster.takeDamage(20);
