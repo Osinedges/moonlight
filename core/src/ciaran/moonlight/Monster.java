@@ -63,16 +63,9 @@ public class Monster {
     animationDeath = new Animation<TextureRegion>(1/15f, death);
     animationDeath.setPlayMode(Animation.PlayMode.NORMAL);
 
-
     this.world = world;
     this.width = width;
     this.height = height;
-//    monsterAtlas = new TextureAtlas(atlas);
-////    monsterRightRegion = monsterAtlas.createSprite(rightSprite);
-//    monsterRightRegion.setSize(width, height);
-////    monsterLeftRegion = monsterAtlas.createSprite(leftSprite);
-//    monsterLeftRegion.setSize(width, height);
-//    monster = monsterRightRegion;
   }
   public void draw(SpriteBatch batch,float deltaTime) {
     stateTime += deltaTime;
@@ -138,8 +131,7 @@ public class Monster {
 
   public void die() {
     isDead = true;
-    monsterLeftRegion.setSize(monsterLeftRegion.getWidth(), monsterLeftRegion.getHeight() / 2);
-    monsterRightRegion.setSize(monsterRightRegion.getWidth(), monsterRightRegion.getHeight() / 2);
+
     world.dropItem(new StaticItem(x, y, 1, 1, "images/items/skull.png"));
   }
 

@@ -97,13 +97,14 @@ public class Moonlight implements Screen {
     createBackground();
 
     createPlayers();
-//    createDemons();
-//    createBlobs();
     createGroundBody();
-//    createMurderer();
     createBricks();
+
     createItems();
+
     createZombie();
+    createSkeleton();
+    createDemon();
   }
 
   private void createItems() {
@@ -151,20 +152,14 @@ public class Moonlight implements Screen {
     player = new Player(world);
   }
 
-//  private void createDemons() {
-//    for (int i = 0; i < NUMBER_OF_MONSTERS; i++) {
-//      monsters.add(new Monster(this, 2, 3, "images/demonSword.atlas", "demonRight", "demonLeft"));
-//    }
-//  }
-//
-//  private void createBlobs() {
-//    monsters.add(new Monster(this, 2, 3, "images/blob.atlas", "blobRight", "blobLeft"));
-//  }
-//  private void createMurderer() {
-//    monsters.add(new Monster(this, 4, 6, "images/murder/murder.atlas", "murdererRight", "murdererLeft"));
-//  }
   private void createZombie() {
-    monsters.add(new Monster(this, 4, 5, "images/zombie/zombie.atlas", "walk", "idle", "attack", "death"));
+    monsters.add(new Monster(this, 6, 6, "images/zombie/zombie.atlas", "walk", "idle", "attack", "death"));
+  }
+  private void createSkeleton() {
+    monsters.add(new Monster(this, 6, 6, "images/skeleton/skeleton.atlas", "walk", "idle", "attack", "death"));
+  }
+  private void createDemon() {
+    monsters.add(new Monster(this, 6, 6, "images/demon/demon.atlas", "walk", "idle", "attack", "death"));
   }
   @Override
   public void show() {
@@ -207,6 +202,7 @@ public class Moonlight implements Screen {
         parent.toggleMenu();
       }
     }
+
     batch.end();
 
     boolean overlappingAMonster = monsters
@@ -292,7 +288,7 @@ public class Moonlight implements Screen {
       player.move();
     }
 
-    if (isAPressed){
+    if (isAPressed && !player.isDead()){
       player.currentlyPunching(true);
 
       Rectangle punchBox = player.getPunchBox();
@@ -322,7 +318,7 @@ public class Moonlight implements Screen {
 //      player.setySpeed(0);
 //    }
 
-    if (isSpacePressed) {
+    if (isSpacePressed && !player.isDead()) {
       player.jump();
     }
 

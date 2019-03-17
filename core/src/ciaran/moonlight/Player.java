@@ -49,6 +49,8 @@ public class Player {
 
   Sound jumping;
   Sound stepping;
+  Sound punchSoundOne;
+  Sound punchSoundTwo;
 
   public Player(World world) {
     textureAtlas = new TextureAtlas(Gdx.files.internal("images/character1/player.atlas"));
@@ -83,6 +85,8 @@ public class Player {
 
     jumping = Gdx.audio.newSound(Gdx.files.internal("images/jump.ogg"));
     stepping = Gdx.audio.newSound(Gdx.files.internal("images/stepping.ogg"));
+    punchSoundOne = Gdx.audio.newSound(Gdx.files.internal("audio/punchOne.ogg"));
+    punchSoundTwo = Gdx.audio.newSound(Gdx.files.internal("audio/punchTwo.ogg"));
 
     createBody(world);
   }
@@ -180,14 +184,20 @@ public class Player {
       animation = animationDeath;
     } else if (punching && punchCounter) {
       animation = animationPunchOne;
+      punchSoundOne.play(0.1f);
+      punchSoundTwo.stop();
     } else if (punching) {
       animation = animationPunchTwo;
+      punchSoundTwo.play(0.1f);
+      punchSoundOne.stop();
     } else if (Math.abs(body.getLinearVelocity().y) >= 2f) {
       animation = animationJump;
     } else if (walking) {
       animation = animationWalk;
     } else {
       animation = animationIdle;
+      punchSoundOne.stop();
+      punchSoundTwo.stop();
     }
 
     if (punching && animation.isAnimationFinished(stateTime)) {

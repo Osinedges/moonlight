@@ -1,5 +1,5 @@
 
-skeleton.png
+demon.png
 size: 1408,256
 format: RGBA8888
 filter: Nearest,Nearest
@@ -116,34 +116,6 @@ walk
   orig: 64, 64
   offset: 0, 0
   index: 4
-walk
-  rotate: false
-  xy: 257, 65
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: 5
-walk
-  rotate: false
-  xy: 321, 65
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: 6
-walk
-  rotate: false
-  xy: 385, 65
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: 7
-walk
-  rotate: false
-  xy: 449, 65
-  size: 64, 64
-  orig: 64, 64
-  offset: 0, 0
-  index: 8
 attack
   rotate: false
   xy: 1, 129
