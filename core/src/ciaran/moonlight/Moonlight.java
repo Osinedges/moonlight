@@ -260,6 +260,10 @@ public class Moonlight implements Screen {
     equipmentTab.draw(uiBatch);
     if (inventoryOpened){
       inventoryBackdrop.draw(uiBatch);
+      playerItems.forEach(item -> {
+        System.out.println("Drawing one player item");
+        item.getSprite().draw(uiBatch);
+      });
     }
     if (Gdx.input.justTouched()) {
       Vector2 touchPos = new Vector2();
@@ -389,7 +393,12 @@ public class Moonlight implements Screen {
       .findAny()
       .ifPresent(item -> {
         InventoryItem newItem = new InventoryItem();
-        newItem.setSprite(item.getSprite());
+        newItem.setSprite(new Sprite(item.getSprite()));
+        newItem.getSprite().setSize(50, 50);
+        newItem.getSprite().setPosition(
+          Gdx.graphics.getWidth() / 2 + 50 * playerItems.size(),
+          Gdx.graphics.getHeight() - 50 * playerItems.size()
+        );
         playerItems.add(newItem);
         items.remove(item);
       });
