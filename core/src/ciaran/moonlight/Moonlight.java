@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
@@ -54,12 +55,17 @@ public class Moonlight implements Screen {
 
   Sprite brick;
   Sprite background;
+  Sprite inventoryTab;
+  Sprite statsTab;
+  Sprite equipmentTab;
 
   float CAM_WIDTH;
   float CAM_HEIGHT;
 
   float BACKGROUND_WIDTH;
   float BACKGROUND_HEIGHT;
+
+  private boolean inventoryOpened;
 
   private OrthographicCamera cam;
 
@@ -228,18 +234,70 @@ public class Moonlight implements Screen {
       shapeRenderer.end();
       player.damage(1);
     }
+
+    Texture inventoryTexture = new Texture(Gdx.files.internal("images/hud/InventoryTab.png"));
+    Texture statsTexture = new Texture(Gdx.files.internal("images/hud/Stats_icon.png"));
+    Texture equipmentTexture = new Texture(Gdx.files.internal("images/hud/Equipment_Stats.png"));
+    Texture inventoryBackground = new Texture(Gdx.files.internal("images/hud/inventoryBackground.png"));
+
+    Sprite inventoryTab = new Sprite(inventoryTexture);
+    Sprite statsTab = new Sprite(statsTexture);
+    Sprite equipmentTab = new Sprite(equipmentTexture);
+    Sprite inventoryBackdrop = new Sprite(inventoryBackground);
+
+    inventoryTab.setPosition(300f, 450f);
+    statsTab.setPosition(inventoryTab.getX() - 50, inventoryTab.getY());
+    equipmentTab.setPosition(inventoryTab.getX() + 50, inventoryTab.getY());
+    inventoryBackdrop.setPosition(inventoryTab.getX() - 120, inventoryTab.getY() - 210);
+
     uiBatch.begin();
     font.draw(uiBatch, "Level: " + player.getLvl(), 10, Gdx.graphics.getHeight() - 8);
     font.draw(uiBatch, "Experience: " + player.getXp(), 10, Gdx.graphics.getHeight() - 32);
     font.draw(uiBatch, "Hitpoints: " + player.getHp() + "/100", 10, Gdx.graphics.getHeight() - 56);
+
+    inventoryTab.draw(uiBatch);
+    statsTab.draw(uiBatch);
+    equipmentTab.draw(uiBatch);
+    if (inventoryOpened){
+      inventoryBackdrop.draw(uiBatch);
+    }
+    if (Gdx.input.isTouched()) {
+      Vector2 touchPos = new Vector2();
+      touchPos.set(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+      System.out.println("Touch Pos" + touchPos);
+      System.out.println("INV TAB" + inventoryTab.getX() + inventoryTab.getY());
+      if (inventoryTab.getBoundingRectangle().contains(touchPos)){
+          inventoryOpened = true;
+          System.out.println("YES YOU CLITCKED THE BOX, WELL DONE...");
+        }
+      }
+
+//    if (Gdx.input.isTouched()) {
+//      Vector2 touchPos = new Vector2();
+//      touchPos.set(Gdx.input.getX(), Gdx.input.getY());
+//      if (touchPos.x > inventoryTab.getX() && touchPos.x < inventoryTab.getX() + inventoryTab.getWidth()) {
+//        if (touchPos.y > inventoryTab.getY() && touchPos.y < inventoryTab.getY() + inventoryTab.getHeight()) {
+//          System.out.println("YOU CLICKED ON IT FUCK YEA");
+//        }
+//      }
+//    }
+
     if (player.isDead()) {
       font.draw(uiBatch, "You Fucking Suck", 50, 50);
     }
+
     uiBatch.end();
+
+
+
 
     doPhysicsStep(deltaTime);
 //    debugRenderer.render(world, cam.combined);
   }
+
+//  public void openInventory(Sprite background){
+//    background.draw(uiBatch);
+//  }
 
   private void doPhysicsStep(float deltaTime) {
     // fixed time step
@@ -276,6 +334,10 @@ public class Moonlight implements Screen {
     player.dispose();
   }
 
+  private boolean overlapsPlayer(Sprite sprite) {
+    return sprite.getBoundingRectangle().overlaps(player.getLogicalBoundingRectangle());
+  }
+
   public void handleInput(float deltaTime) {
 
     boolean isRightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
@@ -283,7 +345,6 @@ public class Moonlight implements Screen {
     boolean isSpacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
     boolean isAPressed = Gdx.input.isKeyPressed(Input.Keys.A);
     boolean isWalkButtonHeld = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
-
     boolean escPressed = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE);
     if (escPressed) {
       paused = true;
@@ -319,13 +380,18 @@ public class Moonlight implements Screen {
 
     player.setWalking(isWalkButtonHeld);
 
-    items.forEach(item -> {
-      if (item.getSprite().getBoundingRectangle().overlaps(player.getLogicalBoundingRectangle())) {
+    items
+      .stream()
+      .filter(item -> overlapsPlayer(item.getSprite()))
+      .findAny()
+      .ifPresent(item -> {
         InventoryItem newItem = new InventoryItem();
         newItem.setSprite(item.getSprite());
         playerItems.add(newItem);
-      }
-    });
+        items.remove(item);
+      });
+
+
 
 //    if (player.getLogicalBoundingRectangle().overlaps(brick.getBoundingRectangle()) && !player.isDead()) {
 ////      player.setPosition(player.getX(), brick.getY() + brick.getHeight());
