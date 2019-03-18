@@ -10,6 +10,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.Random;
+
 public class Monster {
   private final float WALK_SPEED = 10;
 
@@ -37,6 +39,9 @@ public class Monster {
   private boolean walking;
   private boolean facingRight;
 
+  Random rand = new Random();
+  int randomNumber = rand.nextInt(100);
+
   public Monster(Moonlight world,
                  float width,
                  float height,
@@ -48,26 +53,27 @@ public class Monster {
     textureAtlas = new TextureAtlas(Gdx.files.internal(atlas));
     Array<TextureAtlas.AtlasRegion> walk = textureAtlas.findRegions(sWalk);
     Array<TextureAtlas.AtlasRegion> idle = textureAtlas.findRegions(sIdle);
-    Array<TextureAtlas.AtlasRegion> attack= textureAtlas.findRegions(sAttack);
+    Array<TextureAtlas.AtlasRegion> attack = textureAtlas.findRegions(sAttack);
     Array<TextureAtlas.AtlasRegion> death = textureAtlas.findRegions(sDeath);
 
-    animationAttack = new Animation<TextureRegion>(1/11.25f, attack);
+    animationAttack = new Animation<TextureRegion>(1 / 11.25f, attack);
     animationAttack.setPlayMode(Animation.PlayMode.LOOP);
 
-    animationIdle = new Animation<TextureRegion>(1/15f, idle);
+    animationIdle = new Animation<TextureRegion>(1 / 15f, idle);
     animationIdle.setPlayMode(Animation.PlayMode.LOOP);
 
-    animationWalk = new Animation<TextureRegion>(1/15f, walk);
+    animationWalk = new Animation<TextureRegion>(1 / 15f, walk);
     animationWalk.setPlayMode(Animation.PlayMode.LOOP);
 
-    animationDeath = new Animation<TextureRegion>(1/15f, death);
+    animationDeath = new Animation<TextureRegion>(1 / 15f, death);
     animationDeath.setPlayMode(Animation.PlayMode.NORMAL);
 
     this.world = world;
     this.width = width;
     this.height = height;
   }
-  public void draw(SpriteBatch batch,float deltaTime) {
+
+  public void draw(SpriteBatch batch, float deltaTime) {
     stateTime += deltaTime;
 
     Animation<TextureRegion> animation;
@@ -76,8 +82,7 @@ public class Monster {
       animation = animationDeath;
     } else if (walking) {
       animation = animationWalk;
-    }
-    else {
+    } else {
       animation = animationIdle;
     }
 
@@ -132,9 +137,39 @@ public class Monster {
   public void die() {
     isDead = true;
 
-    world.dropItem(new StaticItem(x, y, 1, 1, "images/items/skull.png"));
+    world.dropItem(new StaticItem(x, y, 2, 2, "images/items/skull.png"));
+    world.dropItem(new StaticItem(x + 2, y, 2, 2, generateDropItemImage()));
   }
 
+  public String generateDropItemImage() {
+    switch (lootRoll()) {
+      case 1:
+        return "images/items/sword.png";
+      case 2:
+        return "images/items/orangeGem.png";
+      case 3:
+        return "images/items/goldGem.png";
+      case 4:
+        return "images/items/mushroom.png";
+      default:
+        return "images/items/fish.png";
+    }
+}
+
+  public int lootRoll(){
+    if (randomNumber >= 95){
+      return 1;
+    }
+    else if (randomNumber >= 75){
+      return 2;
+    }
+    else if (randomNumber >= 30){
+      return 4;
+    }
+    else{
+      return 5;
+    }
+  }
 
   public void setPosition(float x, float y) {
     this.x = x;

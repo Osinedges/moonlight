@@ -37,10 +37,16 @@ public class Moonlight implements Screen {
   private final Orchestrator parent;
 
   List<Monster> monsters = new ArrayList<>();
+
   List<StaticItem> items = new ArrayList<>();
 
+  List<InventoryItem> playerItems = new ArrayList<>();
+
+  List<Player> otherPlayers = new ArrayList<>();
+
   Player player;
-//  List<Player> otherPlayers = new ArrayList<>();
+
+
 
   SpriteBatch batch;
   SpriteBatch uiBatch;
@@ -312,6 +318,14 @@ public class Moonlight implements Screen {
 //    }
 
     player.setWalking(isWalkButtonHeld);
+
+    items.forEach(item -> {
+      if (item.getSprite().getBoundingRectangle().overlaps(player.getLogicalBoundingRectangle())) {
+        InventoryItem newItem = new InventoryItem();
+        newItem.setSprite(item.getSprite());
+        playerItems.add(newItem);
+      }
+    });
 
 //    if (player.getLogicalBoundingRectangle().overlaps(brick.getBoundingRectangle()) && !player.isDead()) {
 ////      player.setPosition(player.getX(), brick.getY() + brick.getHeight());

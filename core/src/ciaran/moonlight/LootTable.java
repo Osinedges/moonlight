@@ -8,18 +8,5 @@ public class LootTable {
 
 
 
-  public int LootRoll(){
-    if (randomNumber >= 95){
-      return 1;
-    }
-    else if (randomNumber >= 75){
-      return 2;
-    }
-    else if (randomNumber >= 30){
-      return 4;
-    }
-    else{
-      return 5;
-    }
-  }
+
 }
