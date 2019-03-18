@@ -261,15 +261,18 @@ public class Moonlight implements Screen {
     if (inventoryOpened){
       inventoryBackdrop.draw(uiBatch);
     }
-    if (Gdx.input.isTouched()) {
+    if (Gdx.input.justTouched()) {
       Vector2 touchPos = new Vector2();
       touchPos.set(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
       System.out.println("Touch Pos" + touchPos);
       System.out.println("INV TAB" + inventoryTab.getX() + inventoryTab.getY());
-      if (inventoryTab.getBoundingRectangle().contains(touchPos)){
+      if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == false){
           inventoryOpened = true;
           System.out.println("YES YOU CLITCKED THE BOX, WELL DONE...");
         }
+        else{
+        inventoryOpened = false;
+      }
       }
 
 //    if (Gdx.input.isTouched()) {
