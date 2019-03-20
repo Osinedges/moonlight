@@ -65,7 +65,7 @@ public class Moonlight implements Screen {
   float BACKGROUND_HEIGHT;
 
   private boolean inventoryOpened;
-  private boolean mobileRendered = true;
+  private boolean mobileRendered = false;
 
   private OrthographicCamera cam;
 

@@ -41,7 +41,7 @@ public class Player {
   private int id;
   private int xp = 0;
   private int lvl = 1;
-  private int hp = 100;
+  private int hp = 10000;
   private int maxHp = 100;
   private int inventorySize = 24;
   private int coins = 0;
