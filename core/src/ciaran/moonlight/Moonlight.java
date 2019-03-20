@@ -2,6 +2,7 @@ package ciaran.moonlight;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -55,9 +57,6 @@ public class Moonlight implements Screen {
 
   Sprite brick;
   Sprite background;
-  Sprite inventoryTab;
-  Sprite statsTab;
-  Sprite equipmentTab;
 
   float CAM_WIDTH;
   float CAM_HEIGHT;
@@ -66,6 +65,7 @@ public class Moonlight implements Screen {
   float BACKGROUND_HEIGHT;
 
   private boolean inventoryOpened;
+  private boolean mobileRendered = true;
 
   private OrthographicCamera cam;
 
@@ -78,7 +78,37 @@ public class Moonlight implements Screen {
   private boolean paused;
   private float pauseDelta;
 
+
+  Texture inventoryTexture = new Texture(Gdx.files.internal("images/hud/InventoryTab.png"));
+  Texture statsTexture = new Texture(Gdx.files.internal("images/hud/Stats_icon.png"));
+  Texture equipmentTexture = new Texture(Gdx.files.internal("images/hud/Equipment_Stats.png"));
+  Texture inventoryBackground = new Texture(Gdx.files.internal("images/hud/inventoryBackground.png"));
+
+  Texture leftButton = new Texture(Gdx.files.internal("images/mobilecontrols/leftButton.png"));
+  Texture rightButton = new Texture(Gdx.files.internal("images/mobilecontrols/rightButton.png"));
+  Texture aButton = new Texture(Gdx.files.internal("images/mobilecontrols/aButton.png"));
+  Texture bButton = new Texture(Gdx.files.internal("images/mobilecontrols/bButton.png"));
+  Texture settingsButton = new Texture(Gdx.files.internal("images/mobilecontrols/settingsButton.png"));
+
+  Sprite inventoryTab = new Sprite(inventoryTexture);
+  Sprite statsTab = new Sprite(statsTexture);
+  Sprite equipmentTab = new Sprite(equipmentTexture);
+  Sprite inventoryBackdrop = new Sprite(inventoryBackground);
+
+  Sprite leftbutton = new Sprite(leftButton);
+  Sprite rightbutton = new Sprite(rightButton);
+  Sprite abutton = new Sprite(aButton);
+  Sprite bbutton = new Sprite(bButton);
+  Sprite settingsbutton = new Sprite(settingsButton);
+
   public Moonlight(Orchestrator parent) {
+    Gdx.input.setInputProcessor(new GestureDetector(new GestureDetector.GestureAdapter() {
+      @Override
+      public boolean longPress(float x, float y) {
+        onLongPress(x, y);
+        return false;
+      }
+    }));
     this.parent = parent;
     FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Montserrat-Bold.ttf"));
 
@@ -126,6 +156,26 @@ public class Moonlight implements Screen {
     createSkeleton();
     createDemon();
     createDemon();
+    createDemon();
+    createDemon();
+    createZombie();
+    createSkeleton();
+    createDemon();
+    createDemon();
+    createZombie();
+  }
+
+  private void onLongPress(float x, float y) {
+    Vector2 touchPos = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+    if (inventoryOpened) {
+      playerItems
+        .stream()
+        .filter(item -> item.getSprite().getBoundingRectangle().contains(touchPos))
+        .findAny()
+        .ifPresent(item -> {
+          playerItems.remove(item);
+        });
+    }
   }
 
   private void createItems() {
@@ -235,24 +285,23 @@ public class Moonlight implements Screen {
 
     if (overlappingAMonster)
     {
+
       Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
       Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
       shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
       shapeRenderer.setColor(1, 0, 0, 0.2f);
       shapeRenderer.rect(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
       shapeRenderer.end();
+      //set monster attack animation true here.
       player.damage(1);
     }
 
-    Texture inventoryTexture = new Texture(Gdx.files.internal("images/hud/InventoryTab.png"));
-    Texture statsTexture = new Texture(Gdx.files.internal("images/hud/Stats_icon.png"));
-    Texture equipmentTexture = new Texture(Gdx.files.internal("images/hud/Equipment_Stats.png"));
-    Texture inventoryBackground = new Texture(Gdx.files.internal("images/hud/inventoryBackground.png"));
 
-    Sprite inventoryTab = new Sprite(inventoryTexture);
-    Sprite statsTab = new Sprite(statsTexture);
-    Sprite equipmentTab = new Sprite(equipmentTexture);
-    Sprite inventoryBackdrop = new Sprite(inventoryBackground);
+    leftbutton.setPosition(10, 10);
+    rightbutton.setPosition(100,10);
+    abutton.setPosition(460,10);
+    bbutton.setPosition(550,100);
+    settingsbutton.setPosition(410,430);
 
     inventoryTab.setPosition(300f, 450f);
     statsTab.setPosition(inventoryTab.getX() - 50, inventoryTab.getY());
@@ -265,9 +314,19 @@ public class Moonlight implements Screen {
     font.draw(uiBatch, "Hitpoints: " + player.getHp() + "/100", 10, Gdx.graphics.getHeight() - 56);
     font.draw(uiBatch, "Coins: " + player.getCoins(), 480, Gdx.graphics.getHeight() - 8);
 
+    if(mobileRendered){
+      leftbutton.draw(uiBatch);
+      rightbutton.draw(uiBatch);
+      abutton.draw(uiBatch);
+      bbutton.draw(uiBatch);
+      settingsbutton.draw(uiBatch);
+    }
+
     inventoryTab.draw(uiBatch);
     statsTab.draw(uiBatch);
     equipmentTab.draw(uiBatch);
+
+
     if (inventoryOpened){
       inventoryBackdrop.draw(uiBatch);
       playerItems.forEach(item -> {
@@ -275,12 +334,13 @@ public class Moonlight implements Screen {
         item.getSprite().draw(uiBatch);
       });
     }
+//    if (Gdx.input.)
     if (Gdx.input.justTouched()) {
       Vector2 touchPos = new Vector2();
       touchPos.set(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
       if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == false){
           inventoryOpened = true;
-          System.out.println("YES YOU CLITCKED THE BOX, WELL DONE...");
+          System.out.println("YES YOU CLICKED THE BOX, WELL DONE...");
         }
         else if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == true) {
         inventoryOpened = false;
@@ -290,13 +350,31 @@ public class Moonlight implements Screen {
         .filter(item -> item.getSprite().getBoundingRectangle().contains(touchPos))
         .findAny()
         .ifPresent(item -> {
-          playerItems.remove(item);
-          player.addHp(20);
+          if (item.getType() == ItemType.FISH) {
+            player.addHp(20);
+            playerItems.remove(item);
+          }
+          if (item.getType() == ItemType.MUSHROOM){
+            player.addHp(10);
+            playerItems.remove(item);
+          }
+          if (item.getType() == ItemType.GOLD_GEM){
+            player.addCoins(400);
+            playerItems.remove(item);
+          }
+          if (item.getType() == ItemType.ORANGE_GEM){
+            player.addCoins(100);
+            playerItems.remove(item);
+          }
+          if (item.getType() == ItemType.SWORD){
+            player.equipSword();
+            playerItems.remove(item);
+          }
         } );
     }
 
     if (player.isDead()) {
-      font.draw(uiBatch, "You Suck", 50, 50);
+      font.draw(uiBatch, "You Suck", 270, 50);
     }
 
     uiBatch.end();
@@ -334,6 +412,7 @@ public class Moonlight implements Screen {
 
   @Override
   public void resume() {
+
   }
 
   @Override
@@ -353,12 +432,38 @@ public class Moonlight implements Screen {
 
   public void handleInput(float deltaTime) {
 
-    boolean isRightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT);
-    boolean isLeftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT);
-    boolean isSpacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE);
-    boolean isAPressed = Gdx.input.isKeyPressed(Input.Keys.A);
+    boolean screenButtonLeftPressed = false;
+    boolean screenButtonRightPressed = false;
+    boolean screenButtonAPressed = false;
+    boolean screenButtonBPressed = false;
+    boolean settingsButtonPressed = false;
+
+    if (mobileRendered && Gdx.input.isTouched()){
+      Vector2 touchPos = new Vector2();
+      touchPos.set(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+      if (leftbutton.getBoundingRectangle().contains(touchPos)){
+        screenButtonLeftPressed = true;
+      }
+      if (rightbutton.getBoundingRectangle().contains(touchPos)){
+        screenButtonRightPressed = true;
+      }
+      if (abutton.getBoundingRectangle().contains(touchPos)){
+        screenButtonAPressed = true;
+      }
+      if (bbutton.getBoundingRectangle().contains(touchPos) && Gdx.input.justTouched()){
+        screenButtonBPressed = true;
+      }
+      if (settingsbutton.getBoundingRectangle().contains(touchPos) && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
+        settingsButtonPressed = true;
+      }
+    }
+
+    boolean isRightPressed = Gdx.input.isKeyPressed(Input.Keys.RIGHT) || screenButtonRightPressed;
+    boolean isLeftPressed = Gdx.input.isKeyPressed(Input.Keys.LEFT) || screenButtonLeftPressed;
+    boolean isSpacePressed = Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || screenButtonBPressed;
+    boolean isAPressed = Gdx.input.isKeyPressed(Input.Keys.A) || screenButtonAPressed;
     boolean isWalkButtonHeld = Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
-    boolean escPressed = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE);
+    boolean escPressed = Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || settingsButtonPressed;
     if (escPressed) {
       paused = true;
     }
@@ -377,20 +482,18 @@ public class Moonlight implements Screen {
         if (!monster.isDead && punchBox.overlaps(monster.getLogicalBoundingRectangle())) {
           float kickback = player.isFacingRight() ? 2 : - 2;
           monster.setPosition(monster.getX() + kickback, monster.getY());
-          player.addXP((monster.takeDamage(20)));
+          if (player.isSwordEquipped()){
+            player.addXP((monster.takeDamage(20)));
+          }
+          else player.addXP((monster.takeDamage(4)));
         }
       });
-
-      // code here please
     }
 
     if (isRightPressed && !player.isDead()) {
       player.rotateRight();
       player.move();
     }
-//    if (isAPressed){
-//      player.punch();
-//    }
 
     player.setWalking(isWalkButtonHeld);
     if (playerItems.size() >= player.getInventorySize()) {
@@ -403,6 +506,7 @@ public class Moonlight implements Screen {
         .findAny()
         .ifPresent(item -> {
           InventoryItem newItem = new InventoryItem();
+          newItem.setType(item.getType());
           newItem.setSprite(new Sprite(item.getSprite()));
           newItem.getSprite().setSize(40, 40);
           newItem.getSprite().setPosition(

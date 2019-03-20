@@ -106,6 +106,10 @@ public class Monster {
     facingRight = true;
   }
 
+  public void setAttacking(boolean attacking) {
+    isAttacking = attacking;
+  }
+
   public void rotate() {
     if (facingRight) {
       rotateLeft();
@@ -139,23 +143,30 @@ public class Monster {
   public void die() {
     isDead = true;
 
-    world.dropItem(new StaticItem(x, y, 2, 2, "images/items/skull.png"));
-    world.dropItem(new StaticItem(x + 2, y, 2, 2, generateDropItemImage()));
+    world.dropItem(new StaticItem(x, y, 2, 2, ItemType.SKULL));
+    world.dropItem(generateDropItem(x + 2, y));
   }
 
-  public String generateDropItemImage() {
+  public StaticItem generateDropItem(float x, float y) {
+    ItemType type;
     switch (lootRoll()) {
       case 1:
-        return "images/items/sword.png";
+        type = ItemType.SWORD;
+        break;
       case 2:
-        return "images/items/orangeGem.png";
+        type = ItemType.ORANGE_GEM;
+        break;
       case 3:
-        return "images/items/goldGem.png";
+        type = ItemType.GOLD_GEM;
+        break;
       case 4:
-        return "images/items/mushroom.png";
+        type = ItemType.MUSHROOM;
+        break;
       default:
-        return "images/items/fish.png";
+        type = ItemType.FISH;
     }
+
+    return new StaticItem(x, y, 2, 2, type);
 }
 
   public int lootRoll(){

@@ -17,8 +17,8 @@ public class Orchestrator extends Game {
   @Override
   public void create() {
 //    networkClient = new NetworkClient(this, "localhost", Orchestrator.NAME, "test1");
-    moonlight = new Moonlight(this);
     menu = new MenuScreen(this);
+    moonlight = new Moonlight(this);
     setScreen(moonlight);
   }
 

@@ -20,11 +20,13 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.stream.IntStream;
+
 public class Player {
   private static final float WIDTH = 2;
   private static final float HEIGHT = 3;
   private static final float MAX_VELOCITY = 20;
-  private static final int[] experiences= {
+  private static final int[] experiences = {
     0, 0, 83, 174, 276, 388, 512, 650, 801, 969, 1154, 1358, 1584, 1833, 2107, 2411, 2746, 3115, 3523, 3973,
     4470, 5018, 5624, 6291, 7028, 7842, 8740, 9730, 10824, 12031, 13363, 14833, 16456, 18247, 20224, 22406,
     24815, 27473, 30408, 33648, 37224, 41171, 45529, 50339, 55649, 61512, 67983, 75127, 83014, 91721, 101333,
@@ -48,6 +50,7 @@ public class Player {
   private boolean walking;
   private boolean punching;
   private boolean punchCounter;
+  private boolean swordEquipped = false;
   private TextureAtlas textureAtlas;
   private Animation<TextureRegion> animationWalk;
   private Animation<TextureRegion> animationIdle;
@@ -158,19 +161,25 @@ public class Player {
   }
 
   public int getLevelAtExperience(int experience) {
-    int index;
-
-    for (index = 0; index < experiences.length; index++) {
-      if (experiences[index + 1] > experience)
-        break;
-    }
-
-    return index;
+    return IntStream
+      .range(0, experiences.length)
+      .filter(index -> experiences[index] > experience)
+      .findFirst()
+      .getAsInt();
   }
 
   public int getXp() {
     return xp;
   }
+
+  public void equipSword() {
+    swordEquipped = true;
+  }
+
+  public boolean isSwordEquipped() {
+    return swordEquipped;
+  }
+
   public boolean isDead(){
     return dead;
   }
