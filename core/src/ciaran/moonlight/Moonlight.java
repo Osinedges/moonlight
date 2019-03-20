@@ -268,8 +268,6 @@ public class Moonlight implements Screen {
     if (Gdx.input.justTouched()) {
       Vector2 touchPos = new Vector2();
       touchPos.set(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
-      System.out.println("Touch Pos" + touchPos);
-      System.out.println("INV TAB" + inventoryTab.getX() + inventoryTab.getY());
       if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == false){
           inventoryOpened = true;
           System.out.println("YES YOU CLITCKED THE BOX, WELL DONE...");
@@ -277,20 +275,17 @@ public class Moonlight implements Screen {
         else{
         inventoryOpened = false;
       }
-      }
-
-//    if (Gdx.input.isTouched()) {
-//      Vector2 touchPos = new Vector2();
-//      touchPos.set(Gdx.input.getX(), Gdx.input.getY());
-//      if (touchPos.x > inventoryTab.getX() && touchPos.x < inventoryTab.getX() + inventoryTab.getWidth()) {
-//        if (touchPos.y > inventoryTab.getY() && touchPos.y < inventoryTab.getY() + inventoryTab.getHeight()) {
-//          System.out.println("YOU CLICKED ON IT FUCK YEA");
-//        }
-//      }
-//    }
+      playerItems
+        .stream()
+        .filter(item -> item.getSprite().getBoundingRectangle().contains(touchPos))
+        .findAny()
+        .ifPresent(item -> {
+          playerItems.remove(item);
+        } );
+    }
 
     if (player.isDead()) {
-      font.draw(uiBatch, "You Fucking Suck", 50, 50);
+      font.draw(uiBatch, "You Suck", 50, 50);
     }
 
     uiBatch.end();
@@ -364,13 +359,14 @@ public class Moonlight implements Screen {
 
     if (isAPressed && !player.isDead()){
       player.currentlyPunching(true);
+      player.updateLvl();
 
       Rectangle punchBox = player.getPunchBox();
       monsters.forEach(monster -> {
         if (!monster.isDead && punchBox.overlaps(monster.getLogicalBoundingRectangle())) {
           float kickback = player.isFacingRight() ? 2 : - 2;
           monster.setPosition(monster.getX() + kickback, monster.getY());
-          monster.takeDamage(20);
+          player.addXP((monster.takeDamage(20)));
         }
       });
 
@@ -396,8 +392,8 @@ public class Moonlight implements Screen {
         newItem.setSprite(new Sprite(item.getSprite()));
         newItem.getSprite().setSize(50, 50);
         newItem.getSprite().setPosition(
-          Gdx.graphics.getWidth() / 2 + 50 * playerItems.size(),
-          Gdx.graphics.getHeight() - 50 * playerItems.size()
+          Gdx.graphics.getWidth() / 2 - (2.5f * 50) + 50 * (playerItems.size() % 5),
+          Gdx.graphics.getHeight() - 100 - 50 * (playerItems.size() / 5)
         );
         playerItems.add(newItem);
         items.remove(item);

@@ -124,14 +124,16 @@ public class Monster {
     );
   }
 
-  public void takeDamage(int damage) {
+  public int takeDamage(int damage) {
     if (isDead) {
-      return;
+      return 0;
     }
     hp = hp - damage;
     if (hp <= 0) {
       die();
+      return 250;
     }
+    return 0;
   }
 
   public void die() {
