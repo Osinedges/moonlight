@@ -40,6 +40,9 @@ public class Player {
   private int xp = 0;
   private int lvl = 1;
   private int hp = 100;
+  private int maxHp = 100;
+  private int inventorySize = 24;
+  private int coins = 0;
   private boolean dead = false;
   private boolean facingRight;
   private boolean walking;
@@ -137,6 +140,19 @@ public class Player {
     xp = xp + addxp;
   }
 
+  public void addCoins(int plusCoins){
+    coins += plusCoins;
+  }
+
+  public boolean removeCoins(int minusCoins) {
+    if ((coins -= minusCoins) >= 0) {
+      coins -= minusCoins;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   public int getLevelAtExperience(int experience) {
     int index;
 
@@ -153,6 +169,10 @@ public class Player {
   }
   public boolean isDead(){
     return dead;
+  }
+
+  public int getInventorySize(){
+    return inventorySize;
   }
 
   public void currentlyPunching(boolean punchNow){
@@ -186,6 +206,17 @@ public class Player {
 
   public int getHp() {
     return hp;
+  }
+
+  public void addHp(int newHp) {
+    hp += newHp;
+    if (hp > maxHp) {
+      hp = maxHp;
+    }
+  }
+
+  public void setHp(int hp) {
+    this.hp = hp;
   }
 
   public void rotateLeft() {

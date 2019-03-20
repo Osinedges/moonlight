@@ -117,6 +117,15 @@ public class Moonlight implements Screen {
     createZombie();
     createSkeleton();
     createDemon();
+    createDemon();
+    createZombie();
+    createSkeleton();
+    createDemon();
+    createDemon();
+    createZombie();
+    createSkeleton();
+    createDemon();
+    createDemon();
   }
 
   private void createItems() {
@@ -272,7 +281,7 @@ public class Moonlight implements Screen {
           inventoryOpened = true;
           System.out.println("YES YOU CLITCKED THE BOX, WELL DONE...");
         }
-        else{
+        else if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == true) {
         inventoryOpened = false;
       }
       playerItems
@@ -281,6 +290,7 @@ public class Moonlight implements Screen {
         .findAny()
         .ifPresent(item -> {
           playerItems.remove(item);
+          player.addHp(20);
         } );
     }
 
@@ -382,22 +392,27 @@ public class Moonlight implements Screen {
 //    }
 
     player.setWalking(isWalkButtonHeld);
+    if (playerItems.size() >= player.getInventorySize()) {
+      System.out.println("Your bag is full!");
+    }
+    else {
+      items
+        .stream()
+        .filter(item -> overlapsPlayer(item.getSprite()))
+        .findAny()
+        .ifPresent(item -> {
+          InventoryItem newItem = new InventoryItem();
+          newItem.setSprite(new Sprite(item.getSprite()));
+          newItem.getSprite().setSize(40, 40);
+          newItem.getSprite().setPosition(
+            Gdx.graphics.getWidth() / 2 - (2.5f * 50) + 40 * (playerItems.size() % 6),
+            Gdx.graphics.getHeight() - 100 - 40 * (playerItems.size() / 6)
+          );
+          playerItems.add(newItem);
+          items.remove(item);
+        });
+    }
 
-    items
-      .stream()
-      .filter(item -> overlapsPlayer(item.getSprite()))
-      .findAny()
-      .ifPresent(item -> {
-        InventoryItem newItem = new InventoryItem();
-        newItem.setSprite(new Sprite(item.getSprite()));
-        newItem.getSprite().setSize(50, 50);
-        newItem.getSprite().setPosition(
-          Gdx.graphics.getWidth() / 2 - (2.5f * 50) + 50 * (playerItems.size() % 5),
-          Gdx.graphics.getHeight() - 100 - 50 * (playerItems.size() / 5)
-        );
-        playerItems.add(newItem);
-        items.remove(item);
-      });
 
 
 
