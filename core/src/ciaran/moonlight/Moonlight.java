@@ -263,6 +263,7 @@ public class Moonlight implements Screen {
     font.draw(uiBatch, "Level: " + player.getLvl(), 10, Gdx.graphics.getHeight() - 8);
     font.draw(uiBatch, "Experience: " + player.getXp(), 10, Gdx.graphics.getHeight() - 32);
     font.draw(uiBatch, "Hitpoints: " + player.getHp() + "/100", 10, Gdx.graphics.getHeight() - 56);
+    font.draw(uiBatch, "Coins: " + player.getCoins(), 480, Gdx.graphics.getHeight() - 8);
 
     inventoryTab.draw(uiBatch);
     statsTab.draw(uiBatch);

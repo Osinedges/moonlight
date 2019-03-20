@@ -153,6 +153,10 @@ public class Player {
     }
   }
 
+  public int getCoins() {
+    return coins;
+  }
+
   public int getLevelAtExperience(int experience) {
     int index;
 
