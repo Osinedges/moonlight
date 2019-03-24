@@ -23,11 +23,15 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.IntStream;
 
 import ciaran.moonlight.shared.Character;
 
@@ -60,14 +64,17 @@ public class Moonlight implements Screen {
 
   float CAM_WIDTH;
   float CAM_HEIGHT;
+  private float UI_WIDTH;
+  private float UI_HEIGHT;
 
   float BACKGROUND_WIDTH;
   float BACKGROUND_HEIGHT;
 
   private boolean inventoryOpened;
-  private boolean mobileRendered = false;
+  private boolean mobileRendered = true;
 
   private OrthographicCamera cam;
+  private OrthographicCamera uiCam;
 
   BitmapFont font;
 
@@ -89,6 +96,7 @@ public class Moonlight implements Screen {
   Texture aButton = new Texture(Gdx.files.internal("images/mobilecontrols/aButton.png"));
   Texture bButton = new Texture(Gdx.files.internal("images/mobilecontrols/bButton.png"));
   Texture settingsButton = new Texture(Gdx.files.internal("images/mobilecontrols/settingsButton.png"));
+
 
   Sprite inventoryTab = new Sprite(inventoryTexture);
   Sprite statsTab = new Sprite(statsTexture);
@@ -115,6 +123,27 @@ public class Moonlight implements Screen {
     FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
     parameter.size = 18;
 
+    float w = Gdx.graphics.getWidth();
+    float h = Gdx.graphics.getHeight();
+
+    System.out.println("\n\n Resolution: " + w + ", " + h + "\n\n");
+
+    CAM_WIDTH = 40;
+    CAM_HEIGHT = 40 * (h / w);
+
+    UI_WIDTH = 1280;
+    UI_HEIGHT = 1280 * (h / w);
+
+    inventoryTab.setSize(70, 70);
+    equipmentTab.setSize(70, 70);
+    statsTab.setSize(70, 70);
+    inventoryBackdrop.setSize(UI_WIDTH / 2, UI_HEIGHT / 2);
+
+    leftbutton.setSize(160, 160);
+    rightbutton.setSize(160, 160);
+    abutton.setSize(150, 150);
+    bbutton.setSize(150, 150);
+    settingsbutton.setSize(100, 100);
 
     world = new World(new Vector2(0, -98f), true);
     debugRenderer = new Box2DDebugRenderer();
@@ -126,16 +155,29 @@ public class Moonlight implements Screen {
     uiBatch = new SpriteBatch();
     brick = new Sprite(new Texture("images/brick.png"));
 
-    float w = Gdx.graphics.getWidth();
-    float h = Gdx.graphics.getHeight();
-
-    CAM_WIDTH = 30;
-    CAM_HEIGHT = 30 * (h / w);
 
     cam = new OrthographicCamera(CAM_WIDTH, CAM_HEIGHT);
+    uiCam = new OrthographicCamera(UI_WIDTH, UI_HEIGHT);
 
     cam.position.set(cam.viewportWidth / 2f, cam.viewportHeight / 2f, 0);
     cam.update();
+
+
+    uiCam.position.set(uiCam.viewportWidth / 2f, uiCam.viewportHeight / 2f, 0);
+    uiCam.update();
+
+    inventoryTab.setOriginBasedPosition(UI_WIDTH / 2, UI_HEIGHT - 72);
+    statsTab.setPosition(inventoryTab.getX() - 100, inventoryTab.getY());
+    equipmentTab.setPosition(inventoryTab.getX() + 100, inventoryTab.getY());
+    inventoryBackdrop.setCenter(inventoryTab.getX(),
+      inventoryTab.getY() - 5 - inventoryBackdrop.getHeight() / 2);
+
+    leftbutton.setPosition(20, 20);
+    rightbutton.setPosition(190, 20);
+    abutton.setPosition(950,20);
+    bbutton.setPosition(1100,120);
+    settingsbutton.setPosition(equipmentTab.getX() + 450, inventoryTab.getY() - 20);
+
     createBackground();
 
     createPlayers();
@@ -165,8 +207,17 @@ public class Moonlight implements Screen {
     createZombie();
   }
 
+  private Vector2 getTouchPos () {
+    return getTouchPos(0);
+  }
+
+  private Vector2 getTouchPos (int index) {
+    Vector3 unprojected = uiCam.unproject(new Vector3(Gdx.input.getX(index),  Gdx.input.getY(index), 0));
+    return new Vector2(unprojected.x, unprojected.y);
+  }
+
   private void onLongPress(float x, float y) {
-    Vector2 touchPos = new Vector2(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+    Vector2 touchPos = getTouchPos();
     if (inventoryOpened) {
       playerItems
         .stream()
@@ -195,13 +246,10 @@ public class Moonlight implements Screen {
   }
 
   private void createBackground() {
-    Texture backgroundTexture = new Texture(Gdx.files.internal("images/background.png"));
-    backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-    TextureRegion backgroundTextureRegion = new TextureRegion(backgroundTexture);
-    background = new Sprite(backgroundTextureRegion, 0, 0, 1280 * 3, 1080);
-    BACKGROUND_WIDTH = CAM_WIDTH * 1.5f;
-    BACKGROUND_HEIGHT = CAM_HEIGHT * 1.5f;
-    background.setSize(BACKGROUND_WIDTH * 3, BACKGROUND_HEIGHT);
+    Texture backgroundTexture = new Texture(Gdx.files.internal("images/background/levelOneBackground.png"));
+    background = new Sprite(backgroundTexture);
+    background.setSize(1148, 53);
+    background.setPosition(-100, -10);
   }
 
   private void createGroundBody() {
@@ -212,7 +260,7 @@ public class Moonlight implements Screen {
 
     // Create a polygon shape
     PolygonShape groundBox = new PolygonShape();
-    groundBox.setAsBox(100, 1.0f);
+    groundBox.setAsBox(500, 1.0f);
     // Create a fixture from our polygon shape and add it to our ground body
     groundBody.createFixture(groundBox, 0.0f);
     // Clean up after ourselves
@@ -242,6 +290,7 @@ public class Moonlight implements Screen {
     if (!paused) {
       handleInput(deltaTime);
       cam.update();
+      uiCam.update();
     }
 
     batch.setProjectionMatrix(cam.combined);
@@ -250,7 +299,6 @@ public class Moonlight implements Screen {
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     batch.begin();
 
-    background.setPosition(-BACKGROUND_WIDTH * 1.5f + (player.getX() - player.getX() % BACKGROUND_WIDTH), -14.4f);
     background.draw(batch);
 
     if (!paused) {
@@ -296,23 +344,16 @@ public class Moonlight implements Screen {
       player.damage(1);
     }
 
-
-    leftbutton.setPosition(10, 10);
-    rightbutton.setPosition(100,10);
-    abutton.setPosition(460,10);
-    bbutton.setPosition(550,100);
-    settingsbutton.setPosition(410,430);
-
-    inventoryTab.setPosition(300f, 450f);
-    statsTab.setPosition(inventoryTab.getX() - 50, inventoryTab.getY());
-    equipmentTab.setPosition(inventoryTab.getX() + 50, inventoryTab.getY());
-    inventoryBackdrop.setPosition(inventoryTab.getX() - 120, inventoryTab.getY() - 210);
-
     uiBatch.begin();
-    font.draw(uiBatch, "Level: " + player.getLvl(), 10, Gdx.graphics.getHeight() - 8);
-    font.draw(uiBatch, "Experience: " + player.getXp(), 10, Gdx.graphics.getHeight() - 32);
-    font.draw(uiBatch, "Hitpoints: " + player.getHp() + "/100", 10, Gdx.graphics.getHeight() - 56);
-    font.draw(uiBatch, "Coins: " + player.getCoins(), 480, Gdx.graphics.getHeight() - 8);
+    uiBatch.setProjectionMatrix(uiCam.combined);
+    Vector3 projectedLevel = uiCam.unproject(new Vector3(30, 10, 0));
+    font.draw(uiBatch, "Level: " + player.getLvl(), projectedLevel.x, projectedLevel.y);
+    Vector3 projectedExperience = uiCam.unproject(new Vector3(30, 50, 0));
+    font.draw(uiBatch, "Experience: " + player.getXp(), projectedExperience.x, projectedExperience.y);
+    Vector3 projectedHitpoints = uiCam.unproject(new Vector3(30, 90, 0));
+    font.draw(uiBatch, "Hitpoints: " + player.getHp() + "/100", projectedHitpoints.x, projectedHitpoints.y);
+    Vector3 projectedCoins = uiCam.unproject(new Vector3(30, 140, 0));
+    font.draw(uiBatch, "Coins: " + player.getCoins(), projectedCoins.x, projectedCoins.y);
 
     if(mobileRendered){
       leftbutton.draw(uiBatch);
@@ -336,11 +377,15 @@ public class Moonlight implements Screen {
     }
 //    if (Gdx.input.)
     if (Gdx.input.justTouched()) {
-      Vector2 touchPos = new Vector2();
-      touchPos.set(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
+      Vector2 touchPos = getTouchPos();
+      System.out.println("touched: " + touchPos);
+      System.out.println(inventoryTab.getBoundingRectangle().getY());
+      System.out.println(inventoryTab.getBoundingRectangle().getHeight());
+      System.out.println();
       if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == false){
           inventoryOpened = true;
           System.out.println("YES YOU CLICKED THE BOX, WELL DONE...");
+
         }
         else if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == true) {
         inventoryOpened = false;
@@ -403,7 +448,6 @@ public class Moonlight implements Screen {
 
   @Override
   public void resize(int width, int height) {
-
   }
 
   @Override
@@ -438,23 +482,24 @@ public class Moonlight implements Screen {
     boolean screenButtonBPressed = false;
     boolean settingsButtonPressed = false;
 
-    if (mobileRendered && Gdx.input.isTouched()){
-      Vector2 touchPos = new Vector2();
-      touchPos.set(Gdx.input.getX(), Gdx.graphics.getHeight() - Gdx.input.getY());
-      if (leftbutton.getBoundingRectangle().contains(touchPos)){
-        screenButtonLeftPressed = true;
-      }
-      if (rightbutton.getBoundingRectangle().contains(touchPos)){
-        screenButtonRightPressed = true;
-      }
-      if (abutton.getBoundingRectangle().contains(touchPos)){
-        screenButtonAPressed = true;
-      }
-      if (bbutton.getBoundingRectangle().contains(touchPos) && Gdx.input.justTouched()){
-        screenButtonBPressed = true;
-      }
-      if (settingsbutton.getBoundingRectangle().contains(touchPos) && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
-        settingsButtonPressed = true;
+    for (int index = 0; index <= 10; index++) {
+          if (mobileRendered && Gdx.input.isTouched(index)) {
+            Vector2 touchPos = getTouchPos(index);
+            if (leftbutton.getBoundingRectangle().contains(touchPos)) {
+              screenButtonLeftPressed = true;
+            }
+            if (rightbutton.getBoundingRectangle().contains(touchPos)) {
+              screenButtonRightPressed = true;
+            }
+            if (abutton.getBoundingRectangle().contains(touchPos)) {
+              screenButtonAPressed = true;
+            }
+            if (bbutton.getBoundingRectangle().contains(touchPos) && Gdx.input.justTouched()) {
+              screenButtonBPressed = true;
+            }
+            if (settingsbutton.getBoundingRectangle().contains(touchPos) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+              settingsButtonPressed = true;
+          }
       }
     }
 
@@ -508,10 +553,10 @@ public class Moonlight implements Screen {
           InventoryItem newItem = new InventoryItem();
           newItem.setType(item.getType());
           newItem.setSprite(new Sprite(item.getSprite()));
-          newItem.getSprite().setSize(40, 40);
+          newItem.getSprite().setSize(85, 85);
           newItem.getSprite().setPosition(
-            Gdx.graphics.getWidth() / 2 - (2.5f * 50) + 40 * (playerItems.size() % 6),
-            Gdx.graphics.getHeight() - 100 - 40 * (playerItems.size() / 6)
+            UI_WIDTH / 3 - (1.4f * 45) + 85 * (playerItems.size() % 6),
+            UI_HEIGHT - 200 - 85 * (playerItems.size() / 6)
           );
           playerItems.add(newItem);
           items.remove(item);

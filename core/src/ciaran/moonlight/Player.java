@@ -281,7 +281,7 @@ public class Player {
     TextureRegion keyFrame = animation.getKeyFrame(stateTime);
     sprite = new Sprite(keyFrame);
     sprite.flip(!facingRight, false);
-    sprite.setSize(6, 6);
+    sprite.setSize(8, 8);
     sprite.setOrigin(3.5f, 3.4f);
     sprite.setOriginBasedPosition(body.getPosition().x, body.getPosition().y);
     sprite.setRotation(MathUtils.radiansToDegrees * body.getAngle());

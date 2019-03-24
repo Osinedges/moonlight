@@ -12,6 +12,8 @@ public class DesktopLauncher {
     Log.set(Log.LEVEL_DEBUG);
     LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
     config.fullscreen = false;
+    config.width = 1280;
+    config.height = 800;
     new LwjglApplication(new Orchestrator(), config);
 	}
 }
