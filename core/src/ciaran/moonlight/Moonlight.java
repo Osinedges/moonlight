@@ -134,9 +134,9 @@ public class Moonlight implements Screen {
     UI_WIDTH = 1280;
     UI_HEIGHT = 1280 * (h / w);
 
-    inventoryTab.setSize(70, 70);
-    equipmentTab.setSize(70, 70);
-    statsTab.setSize(70, 70);
+    inventoryTab.setSize(100, 100);
+    equipmentTab.setSize(100, 100);
+    statsTab.setSize(100, 100);
     inventoryBackdrop.setSize(UI_WIDTH / 2, UI_HEIGHT / 2);
 
     leftbutton.setSize(160, 160);
@@ -166,9 +166,9 @@ public class Moonlight implements Screen {
     uiCam.position.set(uiCam.viewportWidth / 2f, uiCam.viewportHeight / 2f, 0);
     uiCam.update();
 
-    inventoryTab.setOriginBasedPosition(UI_WIDTH / 2, UI_HEIGHT - 72);
-    statsTab.setPosition(inventoryTab.getX() - 100, inventoryTab.getY());
-    equipmentTab.setPosition(inventoryTab.getX() + 100, inventoryTab.getY());
+    inventoryTab.setOriginBasedPosition(UI_WIDTH / 2 + 200, UI_HEIGHT + 130);
+    statsTab.setPosition(inventoryTab.getX() - 150, inventoryTab.getY());
+    equipmentTab.setPosition(inventoryTab.getX() + 150, inventoryTab.getY());
     inventoryBackdrop.setCenter(inventoryTab.getX(),
       inventoryTab.getY() - 5 - inventoryBackdrop.getHeight() / 2);
 
@@ -555,7 +555,7 @@ public class Moonlight implements Screen {
           newItem.setSprite(new Sprite(item.getSprite()));
           newItem.getSprite().setSize(85, 85);
           newItem.getSprite().setPosition(
-            UI_WIDTH / 3 - (1.4f * 45) + 85 * (playerItems.size() % 6),
+            UI_WIDTH / 3 - (1.4f * 45 ) + 85 * (playerItems.size() % 6),
             UI_HEIGHT - 200 - 85 * (playerItems.size() / 6)
           );
           playerItems.add(newItem);
