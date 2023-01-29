@@ -24,7 +24,7 @@ public class MenuScreen implements Screen {
 //    table.setDebug(true);
     stage.addActor(table);
 
-    Skin skin = new Skin(Gdx.files.internal("skin/skin.json"));
+    Skin skin = new Skin(Gdx.files.internal("C:\\moonlight\\android\\assets\\skin\\skin.json"));
 
     //create buttons
     TextButton newGame = new TextButton("New Game", skin);

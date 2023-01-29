@@ -118,7 +118,7 @@ public class Moonlight implements Screen {
       }
     }));
     this.parent = parent;
-    FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Montserrat-Bold.ttf"));
+    FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("C:\\moonlight\\android\\assets\\Montserrat-Bold.ttf"));
 
     FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
     parameter.size = 18;
@@ -396,11 +396,11 @@ public class Moonlight implements Screen {
         .findAny()
         .ifPresent(item -> {
           if (item.getType() == ItemType.FISH) {
-            player.addHp(20);
+            player.addHp(30);
             playerItems.remove(item);
           }
           if (item.getType() == ItemType.MUSHROOM){
-            player.addHp(10);
+            player.addHp(40);
             playerItems.remove(item);
           }
           if (item.getType() == ItemType.GOLD_GEM){
@@ -413,6 +413,10 @@ public class Moonlight implements Screen {
           }
           if (item.getType() == ItemType.SWORD){
             player.equipSword();
+            playerItems.remove(item);
+          }
+          if (item.getType() == ItemType.SKULL){
+            player.addXP(150);
             playerItems.remove(item);
           }
         } );
