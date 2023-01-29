@@ -54,7 +54,6 @@ public class Moonlight implements Screen {
   Player player;
 
 
-
   SpriteBatch batch;
   SpriteBatch uiBatch;
   ShapeRenderer shapeRenderer;
@@ -174,8 +173,8 @@ public class Moonlight implements Screen {
 
     leftbutton.setPosition(20, 20);
     rightbutton.setPosition(190, 20);
-    abutton.setPosition(950,20);
-    bbutton.setPosition(1100,120);
+    abutton.setPosition(950, 20);
+    bbutton.setPosition(1100, 120);
     settingsbutton.setPosition(equipmentTab.getX() + 450, inventoryTab.getY() - 20);
 
     createBackground();
@@ -207,12 +206,12 @@ public class Moonlight implements Screen {
     createZombie();
   }
 
-  private Vector2 getTouchPos () {
+  private Vector2 getTouchPos() {
     return getTouchPos(0);
   }
 
-  private Vector2 getTouchPos (int index) {
-    Vector3 unprojected = uiCam.unproject(new Vector3(Gdx.input.getX(index),  Gdx.input.getY(index), 0));
+  private Vector2 getTouchPos(int index) {
+    Vector3 unprojected = uiCam.unproject(new Vector3(Gdx.input.getX(index), Gdx.input.getY(index), 0));
     return new Vector2(unprojected.x, unprojected.y);
   }
 
@@ -274,12 +273,15 @@ public class Moonlight implements Screen {
   private void createZombie() {
     monsters.add(new Monster(this, 6, 6, "images/zombie/zombie.atlas", "walk", "idle", "attack", "death"));
   }
+
   private void createSkeleton() {
     monsters.add(new Monster(this, 6, 6, "images/skeleton/skeleton.atlas", "walk", "idle", "attack", "death"));
   }
+
   private void createDemon() {
     monsters.add(new Monster(this, 6, 6, "images/demon/demon.atlas", "walk", "idle", "attack", "death"));
   }
+
   @Override
   public void show() {
     paused = false;
@@ -305,7 +307,7 @@ public class Moonlight implements Screen {
       player.draw(batch, font, deltaTime);
 //      otherPlayers.forEach(player -> player.getSprite().draw(batch));
 
-      monsters.forEach(monster -> monster.draw(batch,deltaTime));
+      monsters.forEach(monster -> monster.draw(batch, deltaTime));
       items.forEach(item -> item.getSprite().draw(batch));
 
 //      for (int i = 0; i < monsters.size(); i++) {
@@ -331,8 +333,7 @@ public class Moonlight implements Screen {
         monster.getLogicalBoundingRectangle().overlaps(player.getLogicalBoundingRectangle())
       );
 
-    if (overlappingAMonster)
-    {
+    if (overlappingAMonster) {
 
       Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
       Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -355,7 +356,7 @@ public class Moonlight implements Screen {
     Vector3 projectedCoins = uiCam.unproject(new Vector3(30, 140, 0));
     font.draw(uiBatch, "Coins: " + player.getCoins(), projectedCoins.x, projectedCoins.y);
 
-    if(mobileRendered){
+    if (mobileRendered) {
       leftbutton.draw(uiBatch);
       rightbutton.draw(uiBatch);
       abutton.draw(uiBatch);
@@ -368,7 +369,7 @@ public class Moonlight implements Screen {
     equipmentTab.draw(uiBatch);
 
 
-    if (inventoryOpened){
+    if (inventoryOpened) {
       inventoryBackdrop.draw(uiBatch);
       playerItems.forEach(item -> {
         System.out.println("Drawing one player item");
@@ -382,12 +383,11 @@ public class Moonlight implements Screen {
       System.out.println(inventoryTab.getBoundingRectangle().getY());
       System.out.println(inventoryTab.getBoundingRectangle().getHeight());
       System.out.println();
-      if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == false){
-          inventoryOpened = true;
-          System.out.println("YES YOU CLICKED THE BOX, WELL DONE...");
+      if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == false) {
+        inventoryOpened = true;
+        System.out.println("YES YOU CLICKED THE BOX, WELL DONE...");
 
-        }
-        else if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == true) {
+      } else if (inventoryTab.getBoundingRectangle().contains(touchPos) && inventoryOpened == true) {
         inventoryOpened = false;
       }
       playerItems
@@ -395,31 +395,38 @@ public class Moonlight implements Screen {
         .filter(item -> item.getSprite().getBoundingRectangle().contains(touchPos))
         .findAny()
         .ifPresent(item -> {
-          if (item.getType() == ItemType.FISH) {
-            player.addHp(30);
-            playerItems.remove(item);
+          switch (item.getType()) {
+            case FISH:
+              player.addHp(30);
+              playerItems.remove(item);
+              break;
+
+            case MUSHROOM:
+              player.addHp(40);
+              playerItems.remove(item);
+              break;
+
+            case GOLD_GEM:
+              player.addCoins(400);
+              playerItems.remove(item);
+              break;
+
+            case ORANGE_GEM:
+              player.addCoins(100);
+              playerItems.remove(item);
+              break;
+
+            case SWORD:
+              player.equipSword();
+              playerItems.remove(item);
+              break;
+
+            case SKULL:
+              player.addXP(150);
+              playerItems.remove(item);
+              break;
           }
-          if (item.getType() == ItemType.MUSHROOM){
-            player.addHp(40);
-            playerItems.remove(item);
-          }
-          if (item.getType() == ItemType.GOLD_GEM){
-            player.addCoins(400);
-            playerItems.remove(item);
-          }
-          if (item.getType() == ItemType.ORANGE_GEM){
-            player.addCoins(100);
-            playerItems.remove(item);
-          }
-          if (item.getType() == ItemType.SWORD){
-            player.equipSword();
-            playerItems.remove(item);
-          }
-          if (item.getType() == ItemType.SKULL){
-            player.addXP(150);
-            playerItems.remove(item);
-          }
-        } );
+        });
     }
 
     if (player.isDead()) {
@@ -427,8 +434,6 @@ public class Moonlight implements Screen {
     }
 
     uiBatch.end();
-
-
 
 
     doPhysicsStep(deltaTime);
@@ -487,23 +492,23 @@ public class Moonlight implements Screen {
     boolean settingsButtonPressed = false;
 
     for (int index = 0; index <= 10; index++) {
-          if (mobileRendered && Gdx.input.isTouched(index)) {
-            Vector2 touchPos = getTouchPos(index);
-            if (leftbutton.getBoundingRectangle().contains(touchPos)) {
-              screenButtonLeftPressed = true;
-            }
-            if (rightbutton.getBoundingRectangle().contains(touchPos)) {
-              screenButtonRightPressed = true;
-            }
-            if (abutton.getBoundingRectangle().contains(touchPos)) {
-              screenButtonAPressed = true;
-            }
-            if (bbutton.getBoundingRectangle().contains(touchPos) && Gdx.input.justTouched()) {
-              screenButtonBPressed = true;
-            }
-            if (settingsbutton.getBoundingRectangle().contains(touchPos) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-              settingsButtonPressed = true;
-          }
+      if (mobileRendered && Gdx.input.isTouched(index)) {
+        Vector2 touchPos = getTouchPos(index);
+        if (leftbutton.getBoundingRectangle().contains(touchPos)) {
+          screenButtonLeftPressed = true;
+        }
+        if (rightbutton.getBoundingRectangle().contains(touchPos)) {
+          screenButtonRightPressed = true;
+        }
+        if (abutton.getBoundingRectangle().contains(touchPos)) {
+          screenButtonAPressed = true;
+        }
+        if (bbutton.getBoundingRectangle().contains(touchPos) && Gdx.input.justTouched()) {
+          screenButtonBPressed = true;
+        }
+        if (settingsbutton.getBoundingRectangle().contains(touchPos) || Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+          settingsButtonPressed = true;
+        }
       }
     }
 
@@ -522,19 +527,18 @@ public class Moonlight implements Screen {
       player.move();
     }
 
-    if (isAPressed && !player.isDead()){
+    if (isAPressed && !player.isDead()) {
       player.currentlyPunching(true);
       player.updateLvl();
 
       Rectangle punchBox = player.getPunchBox();
       monsters.forEach(monster -> {
         if (!monster.isDead && punchBox.overlaps(monster.getLogicalBoundingRectangle())) {
-          float kickback = player.isFacingRight() ? 2 : - 2;
+          float kickback = player.isFacingRight() ? 2 : -2;
           monster.setPosition(monster.getX() + kickback, monster.getY());
-          if (player.isSwordEquipped()){
+          if (player.isSwordEquipped()) {
             player.addXP((monster.takeDamage(20)));
-          }
-          else player.addXP((monster.takeDamage(4)));
+          } else player.addXP((monster.takeDamage(4)));
         }
       });
     }
@@ -547,8 +551,7 @@ public class Moonlight implements Screen {
     player.setWalking(isWalkButtonHeld);
     if (playerItems.size() >= player.getInventorySize()) {
       System.out.println("Your bag is full!");
-    }
-    else {
+    } else {
       items
         .stream()
         .filter(item -> overlapsPlayer(item.getSprite()))
@@ -559,15 +562,13 @@ public class Moonlight implements Screen {
           newItem.setSprite(new Sprite(item.getSprite()));
           newItem.getSprite().setSize(85, 85);
           newItem.getSprite().setPosition(
-            UI_WIDTH / 3 - (1.4f * 45 ) + 85 * (playerItems.size() % 6),
+            UI_WIDTH / 3 - (1.4f * 45) + 85 * (playerItems.size() % 6),
             UI_HEIGHT - 200 - 85 * (playerItems.size() / 6)
           );
           playerItems.add(newItem);
           items.remove(item);
         });
     }
-
-
 
 
 //    if (player.getLogicalBoundingRectangle().overlaps(brick.getBoundingRectangle()) && !player.isDead()) {
